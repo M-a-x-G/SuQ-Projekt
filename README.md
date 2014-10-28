@@ -1,27 +1,37 @@
+Vollständig indiziertes Wörterbuch (VIW)
+==================================
 
-Aufgabe: Bücherverwaltung
-=========================
-Ein Bücherwurm möchte seine gelesenen Bücher auf einer Webpräsenz auflisten. Die Webseite soll aus mindestens
-zwei Seiten bestehen. Eine Seite zum Auflisten der Bücher und eine Seite zum Speichern der Bücherdaten durch ein Formular. 
-Das Formular soll die Möglichkeit bieten, folgende Daten zu erfassen:
+<b>Es ist ein Generator für ein vollständig indiziertes Wörterbuch zu erstellen.
+Der Generator erhält eine Liste von Wörtern und Definitionen. Daraus generiert er:</b>
+<ol>
+<li> eine alphabetisch sortierte Liste der Wörter mit ihren Definitionen.</li>
+<li> einen alphabetisch sortierten Index der Wörter, die in den Definitionen stehen. </li>
+</ol>
 
-* Titel
-* Autor
-* Jahr
-* Verlag
-* Cover-Bild
+Der Generator hat viele Einsatzmöglichkeiten, dazu gehört das Auflisten aller Wörter und deren Definitionen oder das suchen von Defintionen, die einen bestimmten Begriff beinhalten.
 
-Die Cover­Bilder sollen über das Formular auf S3 gespeichert werden und über CloudFront bereitgestellt werden.
-Die Quellpfade zu den Cover­Bildern und die restlichen Daten sollen auf DynamoDB gespeichert werden. Die Webseite muss 
-auf einer EC2­Instanz oder Elastic Beanstalk bereitgestellt werden.
+<b>Erforderliche Eigenschaften (features)
+Der VIW-Generator:</b>
+<ol>
+<li> darf nur einen Eintrag für Wörter mit mehreren Definitionen erstellen. Alle unterschiedlichen Definitionen zu einem Wort müssen in eine sinnvolle Reihenfolge gebracht werden (z. B. Reihenfolge der Eingabe).</li>
+	
+<li> muss eine Liste von "Stoppwörtern" (stopwords) akzeptieren. Diese Wörter dürfen nicht im Index<br>
+(als Schlagwort ) erscheinen.</li>
+    
+<li> muss ein Interface liefern, durch das Benutzer ein Wort nachschlagen oder alle Definitionen, die einen bestimmten Begriff beinhalten, suchen kann.</li>
+	
+<li> muss eine Möglichkeit bieten, die Daten des VIW zu speichern und zu laden, ohne, dass jedes Mal aus den Eingabedaten ein neues Wörterbuch generiert wird.</li>
+    
+<li> muss Eingabedaten in dem Format der Beispieldateien unterstützen. Die Ausgabedaten können in irgendeinem geeigneten Format gespeichert werden. Die Beispieldateien zur Ausgabe zeigen, wie die Information für den Benutzer dargestellt werden soll.</li>
+    
+<li> muss unabhängig von Diensten des Betriebssystem sein, z. B. kein Einsatz von sort oder ptx in Unix. </li>
+</ol>
+<b>Optionale Eigenschaften (features)</b>
+<ol>
+<li> Der VIW-Generator kann über zusätzliche Eigenschaften verfügen, z. B. Abfragen von Definitionen 
+(Beispiel s. Duden http://www.duden.de/rechtschreibung/)</li>
 
-Features:
+<li> Der VIW-Generator kann über das Internet zugänglich sein, aber auch als App für Smartphones oder Tablet-PC zur Verfügung stehen.</li>
 
-* Suche nach eingetragenen Büchern
-  * Suche nach Titel, Autor, Jahr
-  * Suche auf Seite, auf der auch dei gesamte Liste ausgegeben wird
-
-* Eintragen von neuen Büchern
-  * Warnung bei unzureichender Dateneingabe (fehlendes Jahr, fehlender Autor)
-  * Nach Warnung speichern dennoch möglich
-
+<li> Weitere Erweiterungen können vom Kunden jederzeit hinzugefügt werden.</li>
+</ol>
