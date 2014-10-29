@@ -35,3 +35,19 @@ Der VIW-Generator:</b>
 
 <li> Weitere Erweiterungen können vom Kunden jederzeit hinzugefügt werden.</li>
 </ol>
+
+Config
+==================================
+In der Datei [application.properties](https://github.com/M-a-x-G/SuQ-Projekt/blob/master/src/main/resources/application.properties) muss etw. Nutzername und Passwort angepasst werden.
+
+Zum importieren:
+
+    gradle idea
+
+**oder**
+
+    gradle eclipse
+
+Zum starten:
+
+    gradle bootRun
