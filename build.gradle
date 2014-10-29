@@ -2,6 +2,8 @@ apply plugin: 'java'
 apply plugin: 'spring-boot'
 apply plugin: "groovy"
 apply plugin: "idea"
+apply plugin: 'eclipse'
+apply plugin: 'war'
 
 
 
@@ -15,10 +17,11 @@ buildscript {
         classpath("org.springframework.boot:spring-boot-gradle-plugin:1.2.0.BUILD-SNAPSHOT")
     }
 }
-
-configurations {
-    provided
+war {
+    baseName = 'SuQ-Project'
+    version = '0.0.1-SNAPSHOT'
 }
+
 sourceCompatibility = 1.8
 version = '1.0'
 
