@@ -1,8 +1,10 @@
 package de.fhb.suq.dictionary.model;
 
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.persistence.Entity;
-import javax.persistence.ForeignKey;
+import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
@@ -12,19 +14,21 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 /**
- * Created by Max on 28.10.14.
+ * Created by Max on 02.11.14.
  */
-
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
 @EqualsAndHashCode(callSuper = true)
-@Table(name = "word")
-public class Word extends BaseModel{
+@Table(name = "index")
+public class Index extends BaseModel{
 
     @NotNull
-    private String word;
+    private String keyword;
+
+    @ManyToMany(mappedBy = "indexes")
+    private Set<Definition> definitions = new HashSet<>();
 
 }

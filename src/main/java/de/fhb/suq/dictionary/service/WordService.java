@@ -1,12 +1,10 @@
 package de.fhb.suq.dictionary.service;
 
-import org.springframework.data.domain.Pageable;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-
-import javax.inject.Inject;
 
 import de.fhb.suq.dictionary.model.Word;
 import de.fhb.suq.dictionary.repository.WordRepository;
@@ -20,14 +18,14 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 public class WordService {
 
-    @Inject
+    @Autowired
     private WordRepository wordRepository;
 
-    public void createWord(Word word){
+    public void createWord(Word word) {
         wordRepository.save(word);
     }
 
-    public List<Word> findAll(){
+    public List<Word> findAll() {
         return wordRepository.findAll();
     }
 
