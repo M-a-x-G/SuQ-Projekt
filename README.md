@@ -40,6 +40,8 @@ Config
 ==================================
 In der Datei [application.properties](https://github.com/M-a-x-G/SuQ-Projekt/blob/master/src/main/resources/application.properties) muss etw. Nutzername und Passwort angepasst werden.
 
+**! [Lombok](http://projectlombok.org) wird in der IDE benötigt. !**
+
 Zum importieren:
 
     gradle idea
