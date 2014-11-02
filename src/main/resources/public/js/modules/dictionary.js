@@ -17,7 +17,7 @@
  *  3. This notice may not be removed or altered from any source distribution.
 
  * @author Raoul van Rueschen
- * @version 0.0.1, 10.10.2014
+ * @version 0.0.1, 02.11.2014
  */
 
 var general = general || {};
@@ -27,59 +27,132 @@ var general = general || {};
  "use strict";
 
 /**
- * 
+ * Dictionary Module.
+ * Derived from the Stay module; modified to parse
+ * files locally and send the contents as JSON.
+ *
+ * Also used for requesting page content asynchronously
+ * while staying on one main page.
+ *
+ * Each request has a hard timeout to avoid endless
+ * loading times that are often deemed to fail anyways.
+ * (POST-Request currently don't have a hard timeout.)
  */
 
-general.Stay = function()
+general.Dictionary = function()
 {
- var contents = document.getElementById("contents"),
-  navigation = document.getElementById("navigation"),
-  localEventCache = [], locked = false;
+ var contents = document.getElementById("contents") || document.body,
+  localEventCache = [], nextPage = null,
+  locked = false, backForward = true,
+  loadedFiles = 0, totalFiles = 0,
+  obj = {
+   words: [],
+   definitions: [],
+   stopwords: []
+  };
+
+ /**
+  * Tries to send the object which contains
+  * the parsed data from the input files.
+  * Only sends the object when all files have
+  * been processed. Called asynchronously after 
+  * each parsing process.
+  */
+
+ function tryToSend()
+ {
+  if(loadedFiles >= totalFiles)
+  {
+   general.ajax.open("POST", nextPage, true);
+   general.ajax.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+   general.ajax.send(JSON.stringify(obj));
+  }
+ }
+
+ /**
+  * Parses the contents of the definitions-file.
+  * Called asynchronously when the file has been read.
+  */
+
+ function parseDefinitions(event)
+ {
+  ++loadedFiles;
+  tryToSend();
+ }
+
+ /**
+  * Reads the selected files in the given form.
+  * Only tries to parse two specific inputs with ID
+  * #definitions and #stopwords.
+  *
+  * @param form Form DOM element.
+  */
+
+ function readFiles(form)
+ {
+  var f1, f2, definitionsReader, stopwordsReader;
+
+  // Check if the File API is available.
+  if(window.File && window.FileReader && window.FileList && window.Blob)
+  {
+   loadedFiles = 0;
+
+   if(form.definitions && form.definitions.files.length > 0)
+   {
+    totalFiles = 1;
+    f1 = form.definitions.files[0];
+    definitionsReader = new FileReader();
+    window.addEvent(definitionsReader, "load", parseDefinitions);
+
+    if(form.stopwords && form.stopwords.files.length > 0)
+    {
+     totalFiles = 2;
+     f2 = form.stopwords.files[0];
+     stopwordsReader = new FileReader();
+     window.addEvent(stopwordsReader, "load", function(event)
+     {
+      obj.stopwords = this.result.split(' ');
+      ++loadedFiles;
+      tryToSend();
+     });
+     stopwordsReader.readAsText(f2);
+    }
+
+    definitionsReader.readAsText(f1);
+   }
+   else
+   {
+    locked = false;
+   }
+  }
+  else
+  {
+   contents.innerHTML = "<h1>Fehler</h1><p>Die FileReader API ist in Ihrem Browser nicht verf&uuml;gbar.</p>";
+  }
+ }
 
  /**
   * Uses ajax to request pages.
-  * Locks the whole system until the response has
+  * Locks the request system until the response has
   * been received and processed.
   * 
-  * @param firingElement A registered element whose click event was triggered.
+  * @param firingElement A registered element whose click or submit event was triggered.
   */
 
  function navigate(firingElement)
  {
-  var property, postDataString, formData, page;
+  locked = true;
 
-  // Collect post data if the firing element is a form.
+  // Read and parse files if the firing element is a form.
   if(firingElement.action)
   {
-   page = firingElement.action;
-   formData = new FormData(firingElement);
+   nextPage = firingElement.action;
+   readFiles(firingElement);
   }
   else
   {
-   page = firingElement.href;
-  }
-
-  nextPage = page;
-  locked = true;
-  //contents.style.opacity = 0.0;
-
-  if(formData)
-  {
-   general.ajax.open("POST", page + "/json");
-   general.ajax.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-
-   for(property in postData)
-   {
-    postDataString = postDataString ? postDataString + "&" : "";
-    postDataString += property + "=" + postData[property];
-   }
-
-   general.ajax.timeout = 10000;
-   general.ajax.send(formData);
-  }
-  else
-  {
-   general.ajax.open("GET", page + "/json", true);
+   nextPage = firingElement.href;
+   general.ajax.open("GET", nextPage, true);
    general.ajax.timeout = 4000;
    general.ajax.send(null);
   }
@@ -99,15 +172,15 @@ general.Stay = function()
   {
    if(this.status === 404)
    {
-    contents.innerHTML = "<h1>Error 404</h1><p>Not found.</p>";
+    contents.innerHTML = "<h1>Fehler 404</h1><p>Not found.</p>";
    }
    else if(this.status === 0)
    {
-    contents.innerHTML = "<h1>Error</h1><p>The server doesn't respond.</p>";
+    contents.innerHTML = "<h1>Fehler</h1><p>Der Server antwortet nicht.</p>";
    }
    else if(this.status !== 200)
    {
-    contents.innerHTML = "<h1>Error " + this.status + "</h1><p>The request failed.</p>";
+    contents.innerHTML = "<h1>Fehler " + this.status + "</h1><p>Die Anfrage ist fehlgeschlagen.</p>";
    }
    else
    {
@@ -115,21 +188,19 @@ general.Stay = function()
     {
      response = JSON.parse(this.responseText);
      contents.innerHTML = response.html;
-     contents.style.visibility = "visible";
-     contents.style.opacity = 1.0;
-     contents.style.transform = "scale(1.0, 1.0)";
-
-     if(navigation.innerHTML !== response.navigation)
-     {
-      navigation.innerHTML = response.navigation;
-     }
 
      release();
      bind();
+
+     // Use the History API only if it's available.
+     if(History.Adapter)
+     {
+      History.pushState(null, response.title, nextPage); // this.responseURL may contain rubbish at the end.
+     }
     }
     catch(e)
     {
-     contents.innerHTML = "<h1>Error</h1><p>" + e.message + "</p>";
+     contents.innerHTML = "<h1>Fehler</h1><p>" + e.message + "</p>";
     }
    }
 
@@ -234,13 +305,7 @@ general.Stay = function()
 
   if(backForward)
   {
-   if(state.hash !== "/")
-   {
-    navigate({href: state.cleanUrl});
-   }
-   else
-   {
-   }
+   navigate({href: state.cleanUrl});
   }
   else
   {
@@ -268,9 +333,15 @@ general.Stay = function()
   // A simple listener that deals with ajax timeouts.
   window.addEvent(general.ajax, "timeout", function()
   {
-   contents.innerHTML = "<h1>Error</h1><p>The server didn't respond in time. Please try again later!</p>";
+   contents.innerHTML = "<h1>Fehler</h1><p>Der Server hat nicht rechtzeitig antworten k&ouml;nnen. Versuchen Sie es sp&auml;ter erneut!</p>";
    locked = false;
   });
+
+  // Listen to history state changes.
+  if(History.Adapter)
+  {
+   History.Adapter.bind(window, "statechange", handleBackForward);
+  }
 
   // First time binding all links and forms to event listeners.
   bind();
@@ -283,7 +354,7 @@ general.Stay = function()
 
 window.addEvent(document, "DOMContentLoaded", function()
 {
- new general.Stay();
+ new general.Dictionary();
 });
 
 /** End of Strict-Mode-Encapsulation **/
