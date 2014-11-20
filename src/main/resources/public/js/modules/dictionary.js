@@ -64,7 +64,7 @@ general.Dictionary = function()
   if(loadedFiles >= totalFiles)
   {
    general.ajax.open("POST", nextPage, true);
-   general.ajax.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+   general.ajax.setRequestHeader("Content-Type", "application/json; charset=ISO-8859-1");
    general.ajax.send(JSON.stringify(obj));
   }
  }
@@ -76,6 +76,39 @@ general.Dictionary = function()
 
  function parseDefinitions(event)
  {
+  var regex = /\r?\n|\r|^\s|\s$/g,
+   i, j, len, arr, lastSpace, word;
+
+  arr = this.result.split(':');
+
+  // The first element is always a single word.
+  obj.words.push(arr[0]);
+  obj.definitions.push([]);
+
+  // Subsequent elements are definitions, which still contain a keyword at the end.
+  for(i = 1, j = 0, len = arr.length; i < len; ++i)
+  {
+   lastSpace = arr[i].lastIndexOf(' ');
+
+   if(lastSpace > 0)
+   {
+    word = arr[i].substring(++lastSpace, arr[i].length);
+
+    // Extract the definition, remove line breaks and unnecessary spaces and save it by using j.
+    obj.definitions[j].push(arr[i].substring(0, --lastSpace).replace(regex, ''));
+
+    // Check if the word is already in the array and if so: use its index.
+    j = obj.words.indexOf(word);
+
+    // Otherwise, push it and make some room for more definitions.
+    if(j < 0)
+    {
+     j = obj.words.push(word) - 1;
+     obj.definitions.push([]);
+    }
+   }
+  }
+
   ++loadedFiles;
   tryToSend();
  }
@@ -115,10 +148,11 @@ general.Dictionary = function()
       ++loadedFiles;
       tryToSend();
      });
-     stopwordsReader.readAsText(f2);
+
+     stopwordsReader.readAsText(f2, "ISO-8859-1");
     }
 
-    definitionsReader.readAsText(f1);
+    definitionsReader.readAsText(f1, "ISO-8859-1");
    }
    else
    {
@@ -172,7 +206,7 @@ general.Dictionary = function()
   {
    if(this.status === 404)
    {
-    contents.innerHTML = "<h1>Fehler 404</h1><p>Not found.</p>";
+    contents.innerHTML = "<h1>Fehler 404</h1><p>Nicht gefunden.</p>";
    }
    else if(this.status === 0)
    {
