@@ -46,9 +46,8 @@ general.Dictionary = function()
   locked = false, backForward = true,
   loadedFiles = 0, totalFiles = 0,
   obj = {
-   words: [],
-   definitions: [],
-   stopwords: []
+   wordDefs: {},
+   stopwords: null
   };
 
  /**
@@ -72,42 +71,84 @@ general.Dictionary = function()
  /**
   * Parses the contents of the definitions-file.
   * Called asynchronously when the file has been read.
+  *
+  * @this FileReader
   */
 
  function parseDefinitions(event)
  {
-  var regex = /\r?\n|\r|^\s|\s$/g,
+  var regex = /\r?\n|\r|^\s+|\s+$/g,
    i, j, len, arr, lastSpace, word;
 
   arr = this.result.split(':');
 
-  // The first element is always a single word.
-  obj.words.push(arr[0]);
-  obj.definitions.push([]);
+  // The first element is always seen as the first word.
+  word = arr[0];
+  obj.wordDefs[word] = [];
 
   // Subsequent elements are definitions, which still contain a keyword at the end.
-  for(i = 1, j = 0, len = arr.length; i < len; ++i)
+  for(i = 1, len = arr.length; i < len; ++i)
   {
    lastSpace = arr[i].lastIndexOf(' ');
 
    if(lastSpace > 0)
    {
+    // Extract the definition, remove line breaks and unnecessary spaces and save it for the previous word.
+    obj.wordDefs[word].push(arr[i].substring(0, lastSpace).replace(regex, ''));
+
     word = arr[i].substring(++lastSpace, arr[i].length);
 
-    // Extract the definition, remove line breaks and unnecessary spaces and save it by using j.
-    obj.definitions[j].push(arr[i].substring(0, --lastSpace).replace(regex, ''));
-
-    // Check if the word is already in the array and if so: use its index.
-    j = obj.words.indexOf(word);
-
-    // Otherwise, push it and make some room for more definitions.
-    if(j < 0)
+    // If the word doesn't already exist in the map, add it and make some room for more definitions.
+    if(!obj.wordDefs.hasOwnProperty(word))
     {
-     j = obj.words.push(word) - 1;
-     obj.definitions.push([]);
+     obj.wordDefs[word] = [];
     }
    }
   }
+
+  ++loadedFiles;
+  tryToSend();
+ }
+
+ /**
+  * Parses the contents of the stopwords-file.
+  * Called asynchronously when the file has been read.
+  *
+  * @this FileReader
+  */
+
+ function parseStopwords(event)
+ {
+  var i, len,
+   stopwords,
+   regexp = "";
+
+  stopwords = this.result.split(' ');
+
+  i = 0;
+  len = stopwords.length;
+
+  if(len)
+  {
+   regexp = "/";
+  }
+
+  while(i < len)
+  {
+   regexp += "\\b" + stopwords[i++] + "\\b";
+
+   if(i < len)
+   {
+    regexp += "|";
+   }
+   else
+   {
+    regexp += "/g";
+   }
+  }
+
+  obj.stopwords = regexp;
+  console.log(obj.stopwords);
 
   ++loadedFiles;
   tryToSend();
@@ -142,12 +183,7 @@ general.Dictionary = function()
      totalFiles = 2;
      f2 = form.stopwords.files[0];
      stopwordsReader = new FileReader();
-     window.addEvent(stopwordsReader, "load", function(event)
-     {
-      obj.stopwords = this.result.split(' ');
-      ++loadedFiles;
-      tryToSend();
-     });
+     window.addEvent(stopwordsReader, "load", parseStopwords);
 
      stopwordsReader.readAsText(f2, "ISO-8859-1");
     }
@@ -196,6 +232,8 @@ general.Dictionary = function()
   * This function acts when a requested page has completely been received.
   * The response will be a json object or a 404 page. Anything else will 
   * be treated as a json parse exception.
+  *
+  * @this XMLHttpRequest
   */
 
  function processResponse()
@@ -248,6 +286,8 @@ general.Dictionary = function()
   *
   * The context in which this function is called allows access
   * to all attributes of the respective "a" or "submit" element.
+  *
+  * @this HTMLAnchorElement or HTMLFormElement
   */
 
  function handlePageSwitch(event)
@@ -353,14 +393,6 @@ general.Dictionary = function()
 
  (function init()
  {
-  // Make sure that there's a "contents"-container.
-  if(!contents)
-  {
-   contents = document.createElement("div");
-   contents.id = "contents";
-   document.getElementById("main").appendChild(contents);
-  }
-
   // Listen to ajax ready-state changes.
   window.addEvent(general.ajax, "readystatechange", processResponse);
 
