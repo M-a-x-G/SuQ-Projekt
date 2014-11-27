@@ -24,13 +24,13 @@ import lombok.NoArgsConstructor;
 @Entity
 @EqualsAndHashCode(callSuper = true)
 @Table(name = "word_index")
-public class Index extends BaseModel{
+public class WordIndex extends BaseModel{
 
     @NotNull
     @Column(unique = true)
     private String keyword;
 
-    @ManyToMany(mappedBy = "indexes")
+    @ManyToMany(mappedBy = "wordIndexes")
     private Set<Definition> definitions = new HashSet<>();
 
 }

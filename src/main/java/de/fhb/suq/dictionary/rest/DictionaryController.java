@@ -31,8 +31,11 @@ public class DictionaryController {
 
     @RequestMapping(value = "/entries", method = RequestMethod.POST)
     @ResponseBody
-    void addEntries(@RequestBody EntriesDTO dto) {
+    ResponseEntity<String> addEntries(@RequestBody EntriesDTO dto) {
 
+        entriesService.createUpdateEntries(dto);
+
+        return new ResponseEntity<>("Everything added",HttpStatus.ACCEPTED);
 
     }
 

@@ -13,6 +13,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class DefinitionDTO {
-    private String wort;
+    private String word;
     private List<String> definitions;
 }

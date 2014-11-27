@@ -10,10 +10,11 @@ import java.util.List;
 import de.fhb.suq.dictionary.dto.DefinitionDTO;
 import de.fhb.suq.dictionary.dto.EntriesDTO;
 import de.fhb.suq.dictionary.model.Definition;
-import de.fhb.suq.dictionary.model.Index;
 import de.fhb.suq.dictionary.model.Word;
-import de.fhb.suq.dictionary.repository.EntriesRepository;
-import lombok.extern.slf4j.Slf4j;
+import de.fhb.suq.dictionary.model.WordIndex;
+import de.fhb.suq.dictionary.repository.DefinitionRepository;
+import de.fhb.suq.dictionary.repository.WordIndexRepository;
+import de.fhb.suq.dictionary.repository.WordRepository;
 
 /**
  * Created by Max on 29.10.14.
@@ -23,49 +24,50 @@ import lombok.extern.slf4j.Slf4j;
 public class EntriesService {
 
     @Autowired
-    private EntriesRepository entriesRepository;
+    private WordRepository wordRepository;
+
+    @Autowired
+    private DefinitionRepository definitionRepository;
+
+    @Autowired
+    private WordIndexRepository wordIndexRepository;
 
 
-//    public void createUpdateEntries(EntriesDTO entriesDTO) {
-//        final List<DefinitionDTO> definitions = entriesDTO.getDefinitions();
-//        for (DefinitionDTO definitionDTO : definitions) {
-//            Definition definition = new Definition();
-//            //TODO Try
-//            Word word = entriesRepository.save(new Word(definitionDTO.getWort()));
-//            List<String> definitionStringList = definitionDTO.getDefinitions();
-//            for (String definitionString : definitionStringList) {
-//
-//                //TODO Try find
-//                definition.setWord(word);
-//                definition.setValue(definitionString);
-//                definitionString = definitionString.replaceAll("[,.]", "");
-//                definitionString = definitionString.replaceAll(entriesDTO.getStopwords(), "");
-//                for (String keyword : definitionString.split("[ ]")) {
-//                    Index index = entriesRepository.findByKeyword(keyword);
-//                    if (index == null) {
-//                        index = new Index();
-//                        HashSet<Definition> definitionHashSet = new HashSet<>();
-//                        definitionHashSet.add(definition);
-//                        index.setKeyword(keyword);
-//                        index.setDefinitions(definitionHashSet);
-//                        entriesRepository.save(index);
-//                    }else{
-//                        index.getDefinitions().add(definition);
-//                    }
-////                    definition.se
-//                }
-//            }
-//        }
-//    }
+    public void createUpdateEntries(EntriesDTO entriesDTO) {
+        final List<DefinitionDTO> definitions = entriesDTO.getDefinitions();
+        for (DefinitionDTO definitionDTO : definitions) {
+            Definition definition;
+            //Try catch word exist
+            Word word = wordRepository.save(new Word(definitionDTO.getWord()));
 
-//    public List<EntriesDTO> findAll() {
-//
-//        return entriesRepository.findAll();
-//    }
+            List<String> definitionStringList = definitionDTO.getDefinitions();
+            for (String definitionString : definitionStringList) {
 
-//    public List<Word> findAll(Pageable pageable){
-//        return wordRepository.findAll(pageable);
-//    }
+                definition = definitionRepository.findByValue(definitionString);
+                if (definition == null){
+                    definition = new Definition();
+                    definition.setWord(word);
+                    definition.setValue(definitionString);
+                }
 
-//    private
+                definitionString = definitionString.replaceAll("[,.]", "");
+                definitionString = definitionString.replaceAll(entriesDTO.getStopwords(), "");
+                for (String keyword : definitionString.split("[ ]")) {
+                    WordIndex wordIndex = wordIndexRepository.findByKeyword(keyword);
+                    if (wordIndex == null) {
+                        wordIndex = new WordIndex();
+                        HashSet<Definition> definitionHashSet = new HashSet<>();
+                        definitionHashSet.add(definition);
+                        wordIndex.setKeyword(keyword);
+                        wordIndex.setDefinitions(definitionHashSet);
+                        wordIndexRepository.save(wordIndex);
+                    } else {
+                        wordIndex.getDefinitions().add(definition);
+                    }
+                }
+            }
+        }
+    }
+
+
 }
