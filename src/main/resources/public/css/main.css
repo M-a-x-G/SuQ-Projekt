@@ -233,6 +233,7 @@ div[role="complementary"] {
  left: 0;
  right: 0;
  text-align: right;
+ background-color: rgb(240, 240, 240);
  
 }
 
@@ -329,7 +330,7 @@ input[type="checkbox"]:checked {
 }
 
 #upload {
- margin-top: 5vh;
+ margin-top: 15vh;
 }
 
 .label-box {
