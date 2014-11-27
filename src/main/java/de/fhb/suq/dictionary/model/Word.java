@@ -1,9 +1,11 @@
 package de.fhb.suq.dictionary.model;
 
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.ForeignKey;
 import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.NotNull;
 
 import lombok.AllArgsConstructor;
@@ -25,6 +27,7 @@ import lombok.NoArgsConstructor;
 public class Word extends BaseModel{
 
     @NotNull
+    @Column(unique = true)
     private String word;
 
 }
