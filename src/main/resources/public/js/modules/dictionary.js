@@ -22,7 +22,8 @@
 
 var general = general || {};
 
-(function(undefined, window, document)
+// Defines the global objects that are used in this file.
+(function(undefined, window, document, general)
 {
  "use strict";
 
@@ -39,14 +40,14 @@ var general = general || {};
  * (POST-Request currently don't have a hard timeout.)
  */
 
-general.Dictionary = function()
+general.Dictionary = (function()
 {
- var contents = document.getElementById("contents") || document.body,
+ var contents,
   localEventCache = [], nextPage = null,
   locked = false, backForward = true,
   loadedFiles = 0, totalFiles = 0,
   obj = {
-   wordDefs: {},
+   definitions: [],
    stopwords: null
   };
 
@@ -72,38 +73,55 @@ general.Dictionary = function()
   * Parses the contents of the definitions-file.
   * Called asynchronously when the file has been read.
   *
-  * @this FileReader
+  * @this {FileReader}
   */
 
  function parseDefinitions(event)
  {
   var regex = /\r?\n|\r|^\s+|\s+$/g,
-   i, j, len, arr, lastSpace, word;
+   i, j, len, arr, lastSpace, word, wordDefs;
 
   arr = this.result.split(':');
 
-  // The first element is always seen as the first word.
-  word = arr[0];
-  obj.wordDefs[word] = [];
+  // The first element is always a single word.
+  wordDefs = {
+   words: [],
+   definitions: []
+  };
+  wordDefs.words.push(arr[0]);
+  wordDefs.definitions.push([]);
 
   // Subsequent elements are definitions, which still contain a keyword at the end.
-  for(i = 1, len = arr.length; i < len; ++i)
+  for(i = 1, j = 0, len = arr.length; i < len; ++i)
   {
    lastSpace = arr[i].lastIndexOf(' ');
 
    if(lastSpace > 0)
    {
-    // Extract the definition, remove line breaks and unnecessary spaces and save it for the previous word.
-    obj.wordDefs[word].push(arr[i].substring(0, lastSpace).replace(regex, ''));
+    // Extract the definition, remove line breaks and unnecessary spaces and save it by using j.
+    wordDefs.definitions[j].push(arr[i].substring(0, lastSpace).replace(regex, ''));
 
+    // Extract the word.
     word = arr[i].substring(++lastSpace, arr[i].length);
 
-    // If the word doesn't already exist in the map, add it and make some room for more definitions.
-    if(!obj.wordDefs.hasOwnProperty(word))
+    // Check if the word is already in the array and if so: use its index.
+    j = wordDefs.words.indexOf(word);
+
+    // Otherwise, push it and make some room for more definitions.
+    if(j < 0)
     {
-     obj.wordDefs[word] = [];
+     j = wordDefs.words.push(word) - 1;
+     wordDefs.definitions.push([]);
     }
    }
+  }
+
+  for(i = 0, len = wordDefs.words.length; i < len; ++i)
+  {
+   obj.definitions.push({
+    word: wordDefs.words[i],
+    definitions: wordDefs.definitions[i]
+   });
   }
 
   ++loadedFiles;
@@ -114,7 +132,7 @@ general.Dictionary = function()
   * Parses the contents of the stopwords-file.
   * Called asynchronously when the file has been read.
   *
-  * @this FileReader
+  * @this {FileReader}
   */
 
  function parseStopwords(event)
@@ -159,7 +177,7 @@ general.Dictionary = function()
   * Only tries to parse two specific inputs with ID
   * #definitions and #stopwords.
   *
-  * @param form Form DOM element.
+  * @param {HTMLFormElement} form A form in the DOM.
   */
 
  function readFiles(form)
@@ -206,7 +224,7 @@ general.Dictionary = function()
   * Locks the request system until the response has
   * been received and processed.
   * 
-  * @param firingElement A registered element whose click or submit event was triggered.
+  * @param {HTMLElement} firingElement A registered element whose click or submit event was triggered.
   */
 
  function navigate(firingElement)
@@ -229,11 +247,9 @@ general.Dictionary = function()
  }
 
  /**
-  * This function acts when a requested page has completely been received.
-  * The response will be a json object or a 404 page. Anything else will 
-  * be treated as a json parse exception.
+  * This function acts when a request has completely been processed.
   *
-  * @this XMLHttpRequest
+  * @this {XMLHttpRequest}
   */
 
  function processResponse()
@@ -258,11 +274,7 @@ general.Dictionary = function()
    {
     try
     {
-     response = JSON.parse(this.responseText);
-     contents.innerHTML = response.html;
-
-     release();
-     bind();
+     contents.innerHTML = this.responseText;
 
      // Use the History API only if it's available.
      if(History.Adapter)
@@ -278,7 +290,7 @@ general.Dictionary = function()
 
    locked = false;
   }
- };
+ }
 
  /**
   * This function is bound to all links and forms
@@ -287,7 +299,7 @@ general.Dictionary = function()
   * The context in which this function is called allows access
   * to all attributes of the respective "a" or "submit" element.
   *
-  * @this HTMLAnchorElement or HTMLFormElement
+  * @this {HTMLElement}
   */
 
  function handlePageSwitch(event)
@@ -312,36 +324,6 @@ general.Dictionary = function()
  }
 
  /**
-  * Prevents every default click action for a very short time.
-  * Between releasing and re-binding all event listeners on links
-  * and forms, there's a small time gap in which the user may
-  * accidentally leave the page by furiously hammering the 
-  * mouse button. This function covers that gap.
-  */
-
- function transitionHandShake(event)
- {
-  event.preventDefault();
- }
-
- /**
-  * Unbinds all event listeners on links and forms.
-  */
-
- function release()
- {
-  var i, len, lECi;
-
-  window.addEvent(document, "click", transitionHandShake);
-
-  for(i = 0, len = localEventCache.length; i < len; ++i)
-  {
-   lECi = localEventCache[i];
-   window.removeEvent(lECi[0], lECi[1], lECi[2]);
-  }
- }
-
- /**
   * Binds event listeners to all links and forms.
   * Always release before binding.
   */
@@ -350,7 +332,13 @@ general.Dictionary = function()
  {
   var links = document.getElementsByTagName("a"),
    forms = document.getElementsByTagName("form"),
-   i, len, signature;
+   i, len, signature, lECi;
+
+  for(i = 0, len = localEventCache.length; i < len; ++i)
+  {
+   lECi = localEventCache[i];
+   window.removeEvent(lECi[0], lECi[1], lECi[2]);
+  }
 
   for(i = 0, len = links.length; i < len; ++i)
   {
@@ -363,8 +351,6 @@ general.Dictionary = function()
    signature = window.addEvent(forms[i], "submit", handlePageSwitch);
    localEventCache.push(signature);
   }
-
-  window.removeEvent(document, "click", transitionHandShake);
  }
 
  /**
@@ -385,14 +371,16 @@ general.Dictionary = function()
   {
    backForward = true;
   }
- };
+ }
 
  /**
   * Initialization.
   */
 
- (function init()
+ function init()
  {
+  contents = document.getElementById("contents") || document.body
+
   // Listen to ajax ready-state changes.
   window.addEvent(general.ajax, "readystatechange", processResponse);
 
@@ -409,22 +397,16 @@ general.Dictionary = function()
    History.Adapter.bind(window, "statechange", handleBackForward);
   }
 
-  // First time binding all links and forms to event listeners.
+  // Bind all links and forms to event listeners.
   bind();
- }());
-};
+ }
 
-/**
- * Starting point.
- */
-
-window.addEvent(document, "DOMContentLoaded", function()
-{
- new general.Dictionary();
-});
+ // Initialized when DOM content is loaded.
+ window.addEvent(document, "DOMContentLoaded", init);
+}());
 
 /** End of Strict-Mode-Encapsulation **/
-}(undefined, window, document));
+}(undefined, window, document, general));
 
 
 
