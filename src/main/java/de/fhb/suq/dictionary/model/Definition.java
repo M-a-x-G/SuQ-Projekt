@@ -37,6 +37,6 @@ public class Definition extends BaseModel {
 
     @ManyToMany
     @JoinTable(name = "index_to_definition", joinColumns = {@JoinColumn(name = "definition_id")}, inverseJoinColumns = @JoinColumn(name = "index_id"))
-    private Set<Index> indexes = new HashSet<>();
+    private Set<WordIndex> wordIndexes = new HashSet<>();
 
 }

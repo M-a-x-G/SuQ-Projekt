@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class DefinitionDTO {
-    private String word;
-    private List<String> definitions;
+public class EntriesDTO {
+    private List<DefinitionDTO> definitions;
+    private String stopwords;
 }

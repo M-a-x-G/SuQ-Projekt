@@ -3,6 +3,7 @@ package de.fhb.suq.dictionary.model;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
@@ -22,13 +23,14 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Entity
 @EqualsAndHashCode(callSuper = true)
-@Table(name = "index")
-public class Index extends BaseModel{
+@Table(name = "word_index")
+public class WordIndex extends BaseModel{
 
     @NotNull
+    @Column(unique = true)
     private String keyword;
 
-    @ManyToMany(mappedBy = "indexes")
+    @ManyToMany(mappedBy = "wordIndexes")
     private Set<Definition> definitions = new HashSet<>();
 
 }
