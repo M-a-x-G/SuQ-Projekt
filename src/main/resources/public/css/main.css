@@ -19,10 +19,7 @@
  * 01. Fonts
  */
 
-@font-face {
- font-family: Basic;
- src: url("./fonts/OpenSans.ttf");
-}
+@import url(http://fonts.googleapis.com/css?family=Open+Sans);
 
 /**
  * 02. Basics
@@ -36,7 +33,7 @@ html {
 }
 
 body {
- font-family: Basic;
+ font-family: "Open Sans", Sans-Serif;
  font-size: 4vmin;
  color: rgb(12, 12, 12);
  background-color: white;
@@ -128,7 +125,7 @@ td {
 
 a {
  color: blue;
- font-family: Basic;
+ font-family: "Open Sans", Sans-Serif;
  text-decoration: none;
  transition: background-color 0.5s, color 0.5s;
 }
@@ -198,21 +195,23 @@ div[role="banner"] {
 }
 
 #title {
- position: relative;
- top: 90%;
- transform: translateY(-50%);
+ position: absolute;
+ left: 50%;
+ bottom: 10vmin;
+ transform: translateX(-50%);
  text-align: center;
+ white-space: nowrap;
 }
 
 #title h1 {
- font-family: Basic;
+ font-family: "Open Sans", Sans-Serif;
  font-size: 4vmin;
  text-align: center;
  color: rgb(210, 210, 210);
 }
 
 #title h2 {
- font-family: Basic;
+ font-family: "Open Sans", Sans-Serif;
  font-size: 3vmin;
  text-align: center;
  color: rgb(210, 210, 210);
@@ -234,7 +233,6 @@ div[role="complementary"] {
  right: 0;
  text-align: right;
  background-color: rgb(240, 240, 240);
- 
 }
 
 div[role="contentinfo"] {
@@ -244,22 +242,25 @@ div[role="contentinfo"] {
  left: 0;
  right: 0;
  text-align: center;
- height: 6vmin;
+ font-size: 3vmin;
+ color: rgb(255, 80, 80);
+ height: 8vmin;
+ line-height: 8vmin;
  background-color: rgb(235, 235, 235);
 }
 
 #contents {
  position: absolute;
  z-index: 3;
- top: 15vh;
- bottom: 15vh;
+ top: 10vh;
+ bottom: 20vh;
  left: 0;
  right: 0;
  // width: 80vw;
- padding: 4vh 4vw 2vh 4vw;
+ padding: 10vh 10vw 0vh 10vw;
  overflow: hidden;
  text-align: center;
- //border: 2px solid rgb(210, 210, 210);
+ //border-bottom: 4px dashed rgb(235, 235, 235);
 }
 
 /**
@@ -330,7 +331,11 @@ input[type="checkbox"]:checked {
 }
 
 #upload {
- margin-top: 15vh;
+ margin-top: 16vh;
+}
+
+#search {
+ margin-top: 14vh;
 }
 
 .label-box {

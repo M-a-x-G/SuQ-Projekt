@@ -23,7 +23,7 @@
 var dictionary = dictionary || {};
 
 // Defines the global objects that are used in this file.
-(function(window, document, general, dictionary, History)
+(function(window, document, dictionary, History)
 {
  "use strict";
 
@@ -33,8 +33,9 @@ var dictionary = dictionary || {};
 
 dictionary.Controller = (function()
 {
- var requestsLocked = false, backForward = true,
-  localEventCache = [], nextURL = null;
+ var model, view, localEventCache = [],
+  requestsLocked = false, backForward = true,
+  nextURL = null, postfix = "/min";
 
  /**
   * Sends a given object to the URL which is currently set.
@@ -45,13 +46,132 @@ dictionary.Controller = (function()
 
  function sendObject(obj)
  {
-  general.ajax.open("POST", nextURL, true);
-  general.ajax.setRequestHeader("Content-Type", "application/json; charset=ISO-8859-1");
-  general.ajax.send(JSON.stringify(obj));
+  window.ajax.open("POST", nextURL + postfix, true);
+  window.ajax.setRequestHeader("Content-Type", "application/json; charset=ISO-8859-1");
+  window.ajax.send(JSON.stringify(obj));
  }
 
  /**
-  * Uses ajax to request pages.
+  * Processes the data that has been read by the FileReader.
+  *
+  * @this {FileReader}
+  * @param {ProgressEvent} event
+  */
+
+ function handleDefinitions(event)
+ {
+  model.parseDefinitions(this.result, sendObject);
+ }
+
+ /**
+  * Processes the data that has been read by the FileReader.
+  *
+  * @this {FileReader}
+  * @param {ProgressEvent} event
+  */
+
+ function handleStopwords(event)
+ {
+  model.parseStopwords(this.result, sendObject);
+ }
+
+ /**
+  * Validates a file.
+  *
+  * @param {File} file
+  * @return {Object} The result of the validation.
+  */
+
+ function validateFile(file)
+ {
+  var res = {ok: true, msg: ""},
+   a = file.name.split("."),
+   extension = (a.length === 1 || (a[0] === "" && a.length === 2)) ? "" : a.pop();
+
+  if(extension !== "in")
+  {
+   res.ok = false;
+   res.msg = "Die angegebene Datei \"" + file.name + "\" weist nicht den richtigen Dateityp auf!";
+  }
+  else if(file.size > 25600000)
+  {
+   res.ok = false;
+   res.msg = "Die angegebene Datei ist größer als 25Mb! (" + Math.round((file.size / 1024.0) / 1024) + "Mb)";
+  }
+
+  return res;
+ }
+
+ /**
+  * Reads the selected files in the given form.
+  * Currently, this function tries to read only two
+  * specific file input fields: #definitions and #stopwords.
+  *
+  * @param {HTMLFormElement} form A form in the DOM.
+  */
+
+ function readFiles(form)
+ {
+  var f1, f2, v1, v2, dR, sR;
+
+  // Check if the File API is available.
+  if(window.File && window.FileReader && window.FileList && window.Blob)
+  {
+   model.loadedFiles = 0;
+   model.totalFiles = 0;
+
+   // Check if there is a file to work with.
+   if(form.definitions && form.definitions.files.length > 0)
+   {
+    f1 = form.definitions.files[0];
+    v1 = validateFile(f1);
+
+    if(v1.ok)
+    {
+     ++model.totalFiles;
+     dR = new FileReader();
+     window.addEvent(dR, "load", handleDefinitions);
+
+     // Check for optional stopwords.
+     if(form.stopwords && form.stopwords.files.length > 0)
+     {
+      f2 = form.stopwords.files[0];
+      v2 = validateFile(f2);
+
+      if(v2.ok)
+      {
+       ++model.totalFiles;
+       sR = new FileReader();
+       window.addEvent(sR, "load", handleStopwords);
+
+       // Read definitions and stopwords.
+       requestsLocked = true;
+       sR.readAsText(f2, "ISO-8859-1");
+       dR.readAsText(f1, "ISO-8859-1");
+      }
+      else
+      {
+       // Don't read any files and show the error message.
+       view.notify(v2.msg);
+      }
+     }
+     else
+     {
+      // Only read definitions.
+      requestsLocked = true;
+      dR.readAsText(f1, "ISO-8859-1");
+     }
+    }
+    else
+    {
+     view.notify(v1.msg);
+    }
+   }
+  }
+ }
+
+ /**
+  * Uses ajax to issue requests.
   * Locks the request system until the response has
   * been received and processed.
   * 
@@ -60,20 +180,35 @@ dictionary.Controller = (function()
 
  function navigate(firingElement)
  {
-  // Read and parse files if the firing element is a form.
+  var formData;
+
+  view.notify("");
+
   if(firingElement.action)
   {
-   requestsLocked = (firingElement.definitions && firingElement.definitions.files.length > 0);
    nextURL = firingElement.action;
-   dictionary.Model.readFiles(sendObject, firingElement);
+
+   // Read and parse files if the firing element is the upload form.
+   if(firingElement.id === "upload")
+   {
+    readFiles(firingElement);
+   }
+   else
+   {
+    formData = new FormData(firingElement);
+    requestsLocked = true;
+    window.ajax.open("POST", nextURL + postfix, true);
+    window.ajax.timeout = 10000;
+    window.ajax.send(formData);
+   }
   }
   else
   {
-   requestsLocked = true;
    nextURL = firingElement.href;
-   general.ajax.open("GET", nextURL, true);
-   general.ajax.timeout = 4000;
-   general.ajax.send(null);
+   requestsLocked = true;
+   window.ajax.open("GET", nextURL + postfix, true);
+   window.ajax.timeout = 4000;
+   window.ajax.send(null);
   }
  }
 
@@ -87,7 +222,8 @@ dictionary.Controller = (function()
  {
   if(this.readyState === 4)
   {
-   dictionary.View.displayResponse(this);
+   view.displayResponse(this, nextURL);
+   bindListeners();
    requestsLocked = false;
   }
  }
@@ -106,6 +242,8 @@ dictionary.Controller = (function()
  {
   var rightClick = false;
 
+  event.preventDefault();
+
   if(event.which)
   {
    rightClick = (event.which === 3);
@@ -117,7 +255,6 @@ dictionary.Controller = (function()
 
   if(!rightClick && !requestsLocked)
   {
-   event.preventDefault();
    backForward = false;
    navigate(this);
   }
@@ -149,7 +286,7 @@ dictionary.Controller = (function()
 
  function handleTimeout()
  {
-  dictionary.View.display("<h1>Fehler</h1><p>Der Server hat nicht rechtzeitig antworten k&ouml;nnen. Versuchen Sie es sp&auml;ter erneut!</p>");
+  view.display("<h1>Fehler</h1><p>Der Server hat nicht rechtzeitig antworten k&ouml;nnen. Versuchen Sie es sp&auml;ter erneut!</p>");
   requestsLocked = false;
  }
 
@@ -190,15 +327,18 @@ dictionary.Controller = (function()
 
  function init()
  {
-  window.addEvent(general.ajax, "readystatechange", handleResponse);
-  window.addEvent(general.ajax, "timeout", handleTimeout);
+  model = new dictionary.Model();
+  view = new dictionary.View(document.getElementById("contents"), document.getElementById("footer"));
+
+  window.addEvent(window.ajax, "readystatechange", handleResponse);
+  window.addEvent(window.ajax, "timeout", handleTimeout);
   History.Adapter.bind(window, "statechange", handleBackForward);
   bindListeners();
 
   // Check if the File API is available.
   if(!window.File || !window.FileReader || !window.FileList || !window.Blob)
   {
-   dictionary.View.display("<h1>Fehler</h1><p>Die FileReader API ist in Ihrem Browser nicht verf&uuml;gbar.</p>");
+   view.display("<h1>Fehler</h1><p>Die FileReader API ist in Ihrem Browser nicht verf&uuml;gbar.</p>");
   }
  }
 
@@ -209,15 +349,10 @@ dictionary.Controller = (function()
 }());
 
 // Initialized when DOM content is loaded.
-window.addEvent(document, "DOMContentLoaded", function()
-{
- dictionary.Model.init();
- dictionary.View.init();
- dictionary.Controller.init();
-});
+window.addEvent(document, "DOMContentLoaded", dictionary.Controller.init);
 
 /** End of Strict-Mode-Encapsulation **/
-}(window, document, general, dictionary, History));
+}(window, document, dictionary, History));
 
 
 

@@ -9,8 +9,8 @@
     <link rel="stylesheet" href="../css/main.css">
     <script src="../js/libs/general.js"></script>
     <script src="../js/libs/history.js"></script>
-    <script src="../js/modules/dictionary/model.js"></script>
-    <script src="../js/modules/dictionary/view.js"></script>
+    <script src="../js/classes/dictionary/model.js"></script>
+    <script src="../js/classes/dictionary/view.js"></script>
     <script src="../js/modules/dictionary/controller.js"></script>
   </head>
   <body>
@@ -27,6 +27,19 @@
         <noscript>
           <p>Warnung: Javascript ist in Ihrem Browser deaktiviert oder nicht verf&uuml;gbar.</p>
         </noscript>
+        <form action="/entries" method="post" enctype="multipart/form-data" id="upload">
+          <div class="label-box">
+            <label for="definitions">Begriffsdefinitionen</label>
+            <label for="definitions">Stoppw&ouml;rter</label>
+          </div>
+          <div class="input-box">
+            <input type="file" name="definitions" id="definitions" />
+            <input type="file" name="stopwords" id="stopwords" />
+          </div>
+          <div>
+            <input type="submit" value="Hochladen" />
+          </div>
+        </form>
       </div>
     </div>
     <!-- Aside-->
@@ -34,7 +47,7 @@
       <ul id="navigation">
         <li><a href="/search">Suchen</a></li>
         <li><a href="/entries">Hinzuf&uuml;gen</a></li>
-        <li><a href="/dump">Exportieren</a></li>
+        <li><a href="/export">Exportieren</a></li>
       </ul>
     </div>
     <!-- Footer-->
