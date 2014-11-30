@@ -1,14 +1,17 @@
 package de.fhb.suq.dictionary.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import de.fhb.suq.dictionary.dto.DefinitionDTO;
-import de.fhb.suq.dictionary.dto.EntriesDTO;
+import de.fhb.suq.dictionary.dto.ImportDTO;
 import de.fhb.suq.dictionary.model.Definition;
 import de.fhb.suq.dictionary.model.Word;
 import de.fhb.suq.dictionary.model.WordIndex;
@@ -21,7 +24,7 @@ import de.fhb.suq.dictionary.repository.WordRepository;
  */
 @Component
 @Service
-public class EntriesService {
+public class DictionaryService {
 
     @Autowired
     private WordRepository wordRepository;
@@ -32,42 +35,58 @@ public class EntriesService {
     @Autowired
     private WordIndexRepository wordIndexRepository;
 
+    public List<DefinitionDTO> findAllWords() {
+        List<Word> words = wordRepository.findAll();
+        List<DefinitionDTO> out = new ArrayList<>();
 
-    public void createUpdateEntries(EntriesDTO entriesDTO) {
-        final List<DefinitionDTO> definitions = entriesDTO.getDefinitions();
+        for (Word word : words) {
+            List<String> definitions = word.getDefinitions().stream().map(Definition::getValue).collect(Collectors.toList());
+            out.add(new DefinitionDTO(word.getWord(), definitions));
+        }
+
+        return out;
+    }
+
+    public void createUpdateEntries(ImportDTO importDTO) {
+        final List<DefinitionDTO> definitions = importDTO.getDefinitions();
         for (DefinitionDTO definitionDTO : definitions) {
             Definition definition;
-            //Try catch word exist
-            Word word = wordRepository.save(new Word(definitionDTO.getWord()));
-
+            Word word;
+            try {
+                word = wordRepository.save(new Word(definitionDTO.getWord(), null));
+            } catch (DataIntegrityViolationException e) {
+                word = wordRepository.findByWord(definitionDTO.getWord());
+            }
             List<String> definitionStringList = definitionDTO.getDefinitions();
             for (String definitionString : definitionStringList) {
-
                 definition = definitionRepository.findByValue(definitionString);
-                if (definition == null){
+                if (definition == null) {
                     definition = new Definition();
-                    definition.setWord(word);
                     definition.setValue(definitionString);
+                    if (word.getDefinitions() == null) {
+                        word.setDefinitions(new HashSet<>());
+                    }
+                    word.getDefinitions().add(definition);
+                    definition = definitionRepository.save(definition);
+                }
+                if (definition.getWordIndexes() == null) {
+                    definition.setWordIndexes(new HashSet<>());
                 }
 
                 definitionString = definitionString.replaceAll("[,.]", "");
-                definitionString = definitionString.replaceAll(entriesDTO.getStopwords(), "");
+                definitionString = definitionString.replaceAll(importDTO.getStopwords(), "");
                 for (String keyword : definitionString.split("[ ]")) {
                     WordIndex wordIndex = wordIndexRepository.findByKeyword(keyword);
                     if (wordIndex == null) {
                         wordIndex = new WordIndex();
-                        HashSet<Definition> definitionHashSet = new HashSet<>();
-                        definitionHashSet.add(definition);
                         wordIndex.setKeyword(keyword);
-                        wordIndex.setDefinitions(definitionHashSet);
-                        wordIndexRepository.save(wordIndex);
-                    } else {
-                        wordIndex.getDefinitions().add(definition);
+                        wordIndex = wordIndexRepository.save(wordIndex);
                     }
+                    definition.getWordIndexes().add(wordIndex);
                 }
+
             }
+
         }
     }
-
-
 }

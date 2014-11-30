@@ -7,6 +7,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.Serializable;
+import java.util.List;
 
 import de.fhb.suq.dictionary.model.Definition;
 
@@ -25,6 +26,7 @@ public interface DefinitionRepository extends Repository<Definition, Serializabl
     @Transactional(readOnly = false)
     public Definition save(Definition definition);
 
+    public List<Definition> findAll();
 
     @Query("SELECT d FROM Definition d WHERE d.value = :definition")
     public Definition findByValue(@Param("definition") String value);

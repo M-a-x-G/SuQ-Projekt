@@ -22,7 +22,7 @@ public interface WordIndexRepository extends Repository<WordIndex, Serializable>
      * @param wordIndex object
      */
     @Transactional(readOnly = false)
-    public void save(WordIndex wordIndex);
+    public WordIndex save(WordIndex wordIndex);
 
     @Query("SELECT i FROM WordIndex i WHERE i.keyword = :keyword")
     public WordIndex findByKeyword(@Param("keyword") String keyword);
