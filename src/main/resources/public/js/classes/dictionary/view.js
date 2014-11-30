@@ -23,7 +23,7 @@
 var dictionary = dictionary || {};
 
 // Defines the global objects that are used in this file.
-(function(undefined, document, dictionary, History)
+(function(undefined, document, dictionary)
 {
  "use strict";
 
@@ -38,6 +38,19 @@ dictionary.View = function(contents, infos)
 {
  this.contents = (contents === undefined) ? document.body : contents;
  this.infos = (infos === undefined) ? document.body : infos;
+ this.progress = new Image();
+ this.progress.src = "../img/loading.gif";
+};
+
+/**
+ * Visualizes that the site is busy.
+ *
+ * @this {View}
+ */
+
+dictionary.View.prototype.showProgress = function()
+{
+ this.contents.appendChild(this.progress);
 };
 
 /**
@@ -49,71 +62,35 @@ dictionary.View = function(contents, infos)
 
 dictionary.View.prototype.display = function(contents)
 {
+ while(this.contents.firstChild)
+ {
+  this.contents.removeChild(this.contents.firstChild);
+ }
+
  this.contents.innerHTML = contents;
 };
 
 /**
- * Visualizes a given string in the info area.
+ * Adds an anchor element that links to internal downloadable data.
  *
  * @this {View}
- * @param {string} infos The infos to display.
+ * @param {string} url The url to the data object.
  */
 
-dictionary.View.prototype.notify = function(infos)
+dictionary.View.prototype.addDownloadLink = function(name, url)
 {
- this.infos.innerHTML = infos;
-};
+ var div = document.createElement("div"),
+  link = document.createElement("a");
 
-/**
- * Visualizes a server response.
- *
- * @this {View}
- * @param {XMLHttpRequest} response An ajax object containing the actual response information.
- */
-
-dictionary.View.prototype.displayResponse = function(response, nextURL)
-{
- var data, text;
-
- if(response.status === 404)
- {
-  this.contents.innerHTML = "<h1>Fehler 404</h1><p>Nicht gefunden.</p>";
- }
- else if(response.status === 0)
- {
-  this.contents.innerHTML = "<h1>Fehler</h1><p>Der Server antwortet nicht.</p>";
- }
- else if(response.status !== 200)
- {
-  this.contents.innerHTML = "<h1>Fehler " + response.status + "</h1><p>Die Anfrage ist fehlgeschlagen.</p>";
- }
- else
- {
-  try
-  {
-   if(response.responseText)
-   {
-    data = JSON.parse(response.responseText);
-    text = data.contents;
-   }
-   else
-   {
-    text = "<h1>Warnung</h1><p>Die vom Server erhaltene Antwort war leer.</p>";
-   }
-  }
-  catch(e)
-  {
-   // The response text was no JSON string.
-   text = response.responseText;
-  }
-
-  this.contents.innerHTML = text;
-  History.pushState(null, null, nextURL); // responseURL would be the full URL used for this request.
- }
+ link.href = url;
+ link.download = name;
+ link.innerHTML = "Download";
+ div.appendChild(link);
+ this.contents.appendChild(div);
 };
 
 /** End of Strict-Mode-Encapsulation **/
-}(undefined, document, dictionary, History));
+}(undefined, document, dictionary));
 
 
 

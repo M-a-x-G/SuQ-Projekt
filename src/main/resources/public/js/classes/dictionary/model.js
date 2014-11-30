@@ -23,7 +23,7 @@
 var dictionary = dictionary || {};
 
 // Defines the global objects that are used in this file.
-(function(window, dictionary)
+(function(undefined, window, dictionary)
 {
  "use strict";
 
@@ -33,13 +33,56 @@ var dictionary = dictionary || {};
 
 dictionary.Model = function()
 {
+ this._message = null;
+ this._data = null;
  this._loadedFiles = 0;
  this._totalFiles = 0;
  this.bundle = {
   definitions: [],
-  stopwords: ""
+  stopwords: null
  };
 };
+
+/**
+ * Getter for message.
+ */
+
+Object.defineProperty(dictionary.Model.prototype, "message",
+{
+ get: function() { return this._message; },
+ set: function(x) { return this._message = x; }
+});
+
+/**
+ * Getter and Setter for data.
+ */
+
+Object.defineProperty(dictionary.Model.prototype, "data",
+{
+ get: function() { return this._data; },
+ set: function(x) { return this._data = x; }
+});
+
+/**
+ * Tells whether there is data available or not.
+ */
+
+Object.defineProperty(dictionary.Model.prototype, "dataURL",
+{
+ get: function()
+ {
+  return (window.URL ? window.URL.createObjectURL(this.data) : window.webkitURL.createObjectURL(this.data));
+ }
+});
+
+/**
+ * Getter for information about whether there is data available to download.
+ */
+
+Object.defineProperty(dictionary.Model.prototype, "hasData",
+{
+ get: function() { return this.data !== null; }
+});
 
 /**
  * Getter and Setter for loadedFiles.
@@ -123,6 +166,10 @@ dictionary.Model.prototype.parseDefinitions = function(result, callback)
   }
  }
 
+ // Reset the bundle of definitions and stopwords.
+ this.bundle.definitions.length = 0;
+ this.bundle.stopwords = null;
+
  for(i = 0, len = wordDefs.words.length; i < len; ++i)
  {
   this.bundle.definitions.push({
@@ -165,8 +212,56 @@ dictionary.Model.prototype.parseStopwords = function(result, callback)
  this.tryToSend(callback);
 };
 
+/**
+ * Deals with a server response and prepares the received
+ * data for further use.
+ *
+ * @this {Model}
+ * @param {XMLHttpRequest} response An ajax object containing the actual response information.
+ */
+
+dictionary.Model.prototype.extractData = function(response)
+{
+ var parsed;
+
+ if(response.status === 404)
+ {
+  this.message = dictionary.Error.NOT_FOUND;
+ }
+ else if(response.status === 0)
+ {
+  this.message = dictionary.Error.NO_RESPONSE;
+ }
+ else if(response.status < 200 || response.status > 299)
+ {
+  this.message = dictionary.Error.BAD_RESPONSE_CODE + " (" + response.status + ")";
+ }
+ else
+ {
+  this.data = null;
+  this.message = dictionary.Error.EMPTY_RESPONSE;
+
+  if(response.responseText)
+  {
+   this.message = response.responseText;
+
+   try
+   {
+    parsed = JSON.parse(response.responseText);
+    this.data = parsed.contents ? new Blob([parsed.contents], {type: "text/plain"}) : null;
+   }
+   catch(e) {}
+
+   if(this.message.length > 512)
+   {
+    this.message = this.message.substring(0, 512) + "&hellip;";
+   }
+  }
+ }
+};
+
 /** End of Strict-Mode-Encapsulation **/
-}(window, dictionary));
+}(undefined, window, dictionary));
 
 
 

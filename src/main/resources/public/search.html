@@ -7,8 +7,10 @@
     <meta name="description" content="Vollst&auml;ndig indiziertes W&ouml;rterbuch zum Speichern und Suchen von Begriffsdefinitionen.">
     <meta name="robots" content="index, follow">
     <link rel="stylesheet" href="../css/main.css">
+    <script src="http://form-serialize.googlecode.com/svn/trunk/serialize-0.2.min.js"></script>
     <script src="../js/libs/general.js"></script>
     <script src="../js/libs/history.js"></script>
+    <script src="../js/classes/dictionary/error.js"></script>
     <script src="../js/classes/dictionary/model.js"></script>
     <script src="../js/classes/dictionary/view.js"></script>
     <script src="../js/modules/dictionary/controller.js"></script>
@@ -27,7 +29,7 @@
         <noscript>
           <p>Warnung: Javascript ist in Ihrem Browser deaktiviert oder nicht verf&uuml;gbar.</p>
         </noscript>
-        <form action="/search" method="post" enctype="multipart/form-data" id="search">
+        <form action="/search" method="get" id="search">
           <div class="label-box">
             <label for="definitions">Suchbegriff</label>
           </div>
