@@ -267,7 +267,7 @@ dictionary.Model.prototype.extractData = function(response)
    try
    {
     parsed = JSON.parse(response.responseText);
-    this.data = new Blob([parsed], {type: "text/plain"});
+    this.data = new Blob([response.responseText], {type: "text/plain"});
    }
    catch(e)
    {
