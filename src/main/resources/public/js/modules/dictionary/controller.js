@@ -224,6 +224,7 @@ dictionary.Controller = (function()
    model.extractData(this);
    view.display(model.message);
    bindListeners();
+   nextURL = (nextURL.indexOf("entries") < 0) ? nextURL : nextURL.replace("entries", "export.html");
    History.pushState(null, null, nextURL); // this.responseURL would contain the full URL used for this request.
 
    if(model.hasData)
