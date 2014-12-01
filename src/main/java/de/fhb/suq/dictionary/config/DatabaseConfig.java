@@ -16,10 +16,6 @@ import java.util.Properties;
 
 import javax.sql.DataSource;
 
-/**
- * Created by Max on 29.10.14.
- */
-
 @Configuration
 @EnableTransactionManagement
 @PropertySource("classpath:application.properties")
@@ -85,27 +81,7 @@ public class DatabaseConfig {
 
         return entityManagerFactory;
     }
-//    @Bean
-//    public LocalContainerEntityManagerFactoryBean entityManagerFactory(
-//            DataSource dataSource, JpaVendorAdapter jpaVendorAdapter) {
-//        LocalContainerEntityManagerFactoryBean lef = new LocalContainerEntityManagerFactoryBean();
-//        lef.setDataSource(dataSource);
-//        lef.setJpaVendorAdapter(jpaVendorAdapter);
-//        lef.setPackagesToScan(_env.getProperty("entitymanager.packagesToScan"));
-//        return lef;
-//    }
-//    @Bean
-//    public JpaVendorAdapter jpaVendorAdapter() {
-//        HibernateJpaVendorAdapter hibernateJpaVendorAdapter = new HibernateJpaVendorAdapter();
-//        hibernateJpaVendorAdapter.setShowSql(false);
-//        hibernateJpaVendorAdapter.setGenerateDdl(true);
-//        hibernateJpaVendorAdapter.setDatabase(Database.MYSQL);
-//        return hibernateJpaVendorAdapter;
-//    }
-//    @Bean
-//    public PlatformTransactionManager transactionManager() {
-//        return new JpaTransactionManager();
-//    }
+
     /**
      * Method transactionManager
      * <p>

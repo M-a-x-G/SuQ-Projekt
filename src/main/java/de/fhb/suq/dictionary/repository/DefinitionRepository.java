@@ -11,9 +11,6 @@ import java.util.List;
 
 import de.fhb.suq.dictionary.model.Definition;
 
-/**
- * Created by Max on 27.11.14.
- */
 @RepositoryDefinition(domainClass = Definition.class, idClass = Long.class)
 @Transactional(readOnly = true)
 public interface DefinitionRepository extends Repository<Definition, Serializable> {
@@ -26,8 +23,17 @@ public interface DefinitionRepository extends Repository<Definition, Serializabl
     @Transactional(readOnly = false)
     public Definition save(Definition definition);
 
+    /**
+     * Get all Definitions in DB
+     * @return List of Definition objects
+     */
     public List<Definition> findAll();
 
+    /**
+     * Find a Definition object by its value
+     * @param value for search
+     * @return Definition object
+     */
     @Query("SELECT d FROM Definition d WHERE d.value = :definition")
     public Definition findByValue(@Param("definition") String value);
 

@@ -9,9 +9,6 @@ import javax.persistence.MappedSuperclass;
 import lombok.Getter;
 import lombok.Setter;
 
-/**
- * Created by Max on 29.10.14.
- */
 @Setter
 @Getter
 @MappedSuperclass

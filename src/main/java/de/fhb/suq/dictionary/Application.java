@@ -16,6 +16,10 @@ import org.springframework.context.annotation.Configuration;
 @ComponentScan
 public class Application extends SpringBootServletInitializer {
 
+    /**
+     * Main class to start Spring application
+     * @param args
+     */
     public static void main(final String[] args) {
         SpringApplication.run(Application.class, args);
     }

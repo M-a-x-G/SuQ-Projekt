@@ -16,11 +16,6 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
-/**
- * Created by Max on 28.10.14.
- */
-
-
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

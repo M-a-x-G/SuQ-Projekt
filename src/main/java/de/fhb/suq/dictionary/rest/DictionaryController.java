@@ -1,7 +1,6 @@
 package de.fhb.suq.dictionary.rest;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -18,11 +17,6 @@ import de.fhb.suq.dictionary.dto.ImportDTO;
 import de.fhb.suq.dictionary.service.DictionaryService;
 
 
-/**
- * Created by Max on 27.10.14.
- */
-
-
 @RestController
 public class DictionaryController {
 
@@ -30,6 +24,12 @@ public class DictionaryController {
     private DictionaryService dictionaryService;
 
 
+    /**
+     * Endpoint for adding adding entries to DB
+     *
+     * @param dto parsed from JSON request
+     * @return response for client
+     */
     @RequestMapping(value = "/entries", method = RequestMethod.POST)
     @ResponseBody
     ResponseEntity<String> addEntries(@RequestBody ImportDTO dto) {
@@ -37,9 +37,16 @@ public class DictionaryController {
         return new ResponseEntity<>("Everything added", HttpStatus.OK);
     }
 
+
+    /**
+     * Endpoint for getting entries (all/byQuery)
+     *
+     * @param query -> text for search or empty
+     * @return List of DefinitionDTOs as JSON to client
+     */
     @RequestMapping(value = "/entries", method = RequestMethod.GET)
     @ResponseBody
-    public ResponseEntity<List<DefinitionDTO>> getEntries(@RequestParam String query) {
+    public ResponseEntity<List<DefinitionDTO>> getEntries(@RequestParam(defaultValue = "") String query) {
         ResponseEntity<List<DefinitionDTO>> out;
         if (query == null || query.isEmpty()) {
             out = new ResponseEntity<>(dictionaryService.findAllWords(), HttpStatus.OK);

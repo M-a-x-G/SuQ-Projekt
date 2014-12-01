@@ -24,6 +24,11 @@ public interface WordIndexRepository extends Repository<WordIndex, Serializable>
     @Transactional(readOnly = false)
     public WordIndex save(WordIndex wordIndex);
 
+    /**
+     * Search a WordIndex object with by keyword
+     * @param keyword -> string for search
+     * @return WordIndex String
+     */
     @Query("SELECT i FROM WordIndex i WHERE i.keyword = :keyword")
     public WordIndex findByKeyword(@Param("keyword") String keyword);
 

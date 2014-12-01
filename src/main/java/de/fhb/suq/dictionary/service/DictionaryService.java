@@ -5,24 +5,18 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import de.fhb.suq.dictionary.dto.DefinitionDTO;
 import de.fhb.suq.dictionary.dto.ImportDTO;
 import de.fhb.suq.dictionary.model.Definition;
 import de.fhb.suq.dictionary.model.Word;
 import de.fhb.suq.dictionary.model.WordIndex;
-import de.fhb.suq.dictionary.repository.DTOMapper;
 import de.fhb.suq.dictionary.repository.DefinitionRepository;
 import de.fhb.suq.dictionary.repository.WordIndexRepository;
 import de.fhb.suq.dictionary.repository.WordRepository;
 
-/**
- * Created by Max on 29.10.14.
- */
 @Component
 @Service
 public class DictionaryService {
@@ -36,16 +30,30 @@ public class DictionaryService {
     @Autowired
     private WordIndexRepository wordIndexRepository;
 
+
+    /**
+     * Get all words and definitions from DB
+     * @return List of DefinitionDTOs
+     */
     public List<DefinitionDTO> findAllWords() {
         List<Word> words = wordRepository.findAll();
         return DTOMapper.mapWordListToDefinitionDTOList(words);
     }
 
-    public List<DefinitionDTO> findWordsByWord(String query){
+    /**
+     * Get a list of words end definitions
+     * @param query -> text for search
+     * @return List of DefinitionDTOs
+     */
+    public List<DefinitionDTO> findWordsByWord(String query) {
         List<Word> words = wordRepository.findBySearchString(query);
         return DTOMapper.mapWordListToDefinitionDTOList(words);
     }
 
+    /**
+     * Create or update DB with given entries
+     * @param importDTO entries to add
+     */
     public void createUpdateEntries(ImportDTO importDTO) {
         final List<DefinitionDTO> definitions = importDTO.getDefinitions();
         for (DefinitionDTO definitionDTO : definitions) {

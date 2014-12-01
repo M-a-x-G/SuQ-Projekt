@@ -10,12 +10,12 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-/**
- * Created by Max on 02.11.14.
- */
 @Controller
 public class WebActivator {
 
+    /**
+     * Endpoint for index.html
+     */
     @RequestMapping(value = "/", method = RequestMethod.GET)
     public View home() {
         return new View() {

@@ -18,10 +18,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-/**
- * Created by Max on 02.11.14.
- */
-
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity

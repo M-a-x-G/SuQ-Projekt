@@ -1,4 +1,4 @@
-package de.fhb.suq.dictionary.repository;
+package de.fhb.suq.dictionary.service;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -8,11 +8,13 @@ import de.fhb.suq.dictionary.dto.DefinitionDTO;
 import de.fhb.suq.dictionary.model.Definition;
 import de.fhb.suq.dictionary.model.Word;
 
-/**
- * Created by Max on 01.12.14.
- */
 public class DTOMapper {
 
+    /**
+     * Map a list with words definitions to a list with DefinitionDTOs
+     * @param words list
+     * @return List of DefinitionDTOs
+     */
     public static List<DefinitionDTO> mapWordListToDefinitionDTOList(List<Word> words){
         List<DefinitionDTO> out = new ArrayList<>();
         for (Word word : words) {

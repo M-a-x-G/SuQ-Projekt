@@ -14,9 +14,6 @@ import de.fhb.suq.dictionary.model.Definition;
 import de.fhb.suq.dictionary.model.WordIndex;
 import de.fhb.suq.dictionary.model.Word;
 
-/**
- * Created by Max on 29.10.14.
- */
 @RepositoryDefinition(domainClass = Word.class, idClass = Long.class)
 @Transactional(readOnly = true)
 public interface WordRepository extends Repository<Word, Serializable> {
@@ -30,21 +27,31 @@ public interface WordRepository extends Repository<Word, Serializable> {
     public Word save(Word word);
 
     /**
-     *
+     * Find all words
      * @return List of all words
      */
     public List<Word> findAll();
 
     /**
-     *
+     *  Find all words(pageable)
      *
      * @return paged list
      */
     public List<Word> findAll(Pageable pageable);
 
+    /**
+     * Find Word object with given word
+     * @param Word for search
+     * @return Word object
+     */
     public Word findByWord(String Word);
 
 
+    /**
+     * Search for words like search string
+     * @param search text
+     * @return List of Word objects
+     */
     @Query("SELECT w FROM Word w WHERE w.word LIKE :search ORDER BY w.id DESC")
     public List<Word> findBySearchString(@Param("search") String search);
 
