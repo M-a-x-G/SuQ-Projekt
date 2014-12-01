@@ -13,7 +13,7 @@ import de.fhb.suq.dictionary.model.WordIndex;
 /**
  * Created by Max on 27.11.14.
  */
-@RepositoryDefinition(domainClass = WordIndex.class, idClass = Long.class)
+@RepositoryDefinition(domainClass = WordIndex.class, idClass = Integer.class)
 @Transactional(readOnly = true)
 public interface WordIndexRepository extends Repository<WordIndex, Serializable> {
     /**

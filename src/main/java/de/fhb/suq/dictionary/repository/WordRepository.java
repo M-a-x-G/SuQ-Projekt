@@ -14,7 +14,7 @@ import de.fhb.suq.dictionary.model.Definition;
 import de.fhb.suq.dictionary.model.WordIndex;
 import de.fhb.suq.dictionary.model.Word;
 
-@RepositoryDefinition(domainClass = Word.class, idClass = Long.class)
+@RepositoryDefinition(domainClass = Word.class, idClass = Integer.class)
 @Transactional(readOnly = true)
 public interface WordRepository extends Repository<Word, Serializable> {
 
@@ -52,7 +52,7 @@ public interface WordRepository extends Repository<Word, Serializable> {
      * @param search text
      * @return List of Word objects
      */
-    @Query("SELECT w FROM Word w WHERE w.word LIKE :search ORDER BY w.id DESC")
+    @Query("SELECT w FROM Word w WHERE lower(w.word) LIKE CONCAT('%', LOWER(:search), '%') ORDER BY w.id DESC")
     public List<Word> findBySearchString(@Param("search") String search);
 
 }

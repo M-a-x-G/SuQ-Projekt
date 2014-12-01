@@ -14,18 +14,18 @@ import java.util.List;
 
 import de.fhb.suq.dictionary.dto.DefinitionDTO;
 import de.fhb.suq.dictionary.dto.ImportDTO;
-import de.fhb.suq.dictionary.service.DictionaryService;
+import de.fhb.suq.dictionary.service.IDictionaryService;
 
 
 @RestController
 public class DictionaryController {
 
     @Autowired
-    private DictionaryService dictionaryService;
+    private IDictionaryService dictionaryService;
 
 
     /**
-     * Endpoint for adding adding entries to DB
+     * Endpoint for adding entries to DB
      *
      * @param dto parsed from JSON request
      * @return response for client

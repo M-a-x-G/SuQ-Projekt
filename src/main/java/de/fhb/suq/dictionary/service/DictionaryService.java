@@ -19,7 +19,7 @@ import de.fhb.suq.dictionary.repository.WordRepository;
 
 @Component
 @Service
-public class DictionaryService {
+public class DictionaryService implements IDictionaryService {
 
     @Autowired
     private WordRepository wordRepository;
@@ -35,16 +35,18 @@ public class DictionaryService {
      * Get all words and definitions from DB
      * @return List of DefinitionDTOs
      */
+    @Override
     public List<DefinitionDTO> findAllWords() {
         List<Word> words = wordRepository.findAll();
         return DTOMapper.mapWordListToDefinitionDTOList(words);
     }
 
     /**
-     * Get a list of words end definitions
+     * Get a list of words and definitions
      * @param query -> text for search
      * @return List of DefinitionDTOs
      */
+    @Override
     public List<DefinitionDTO> findWordsByWord(String query) {
         List<Word> words = wordRepository.findBySearchString(query);
         return DTOMapper.mapWordListToDefinitionDTOList(words);
@@ -54,6 +56,7 @@ public class DictionaryService {
      * Create or update DB with given entries
      * @param importDTO entries to add
      */
+    @Override
     public void createUpdateEntries(ImportDTO importDTO) {
         final List<DefinitionDTO> definitions = importDTO.getDefinitions();
         for (DefinitionDTO definitionDTO : definitions) {
@@ -96,6 +99,4 @@ public class DictionaryService {
 
         }
     }
-
-
 }

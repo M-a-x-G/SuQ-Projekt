@@ -11,7 +11,7 @@ import java.util.List;
 
 import de.fhb.suq.dictionary.model.Definition;
 
-@RepositoryDefinition(domainClass = Definition.class, idClass = Long.class)
+@RepositoryDefinition(domainClass = Definition.class, idClass = Integer.class)
 @Transactional(readOnly = true)
 public interface DefinitionRepository extends Repository<Definition, Serializable> {
 
