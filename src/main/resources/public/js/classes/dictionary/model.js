@@ -71,7 +71,7 @@ Object.defineProperty(dictionary.Model.prototype, "dataURL",
 {
  get: function()
  {
-  return (window.URL ? window.URL.createObjectURL(this.data) : window.webkitURL.createObjectURL(this.data));
+  return (window.URL ? window.URL.createObjectURL(this._data) : window.webkitURL.createObjectURL(this._data));
  }
 });
 
@@ -81,7 +81,7 @@ Object.defineProperty(dictionary.Model.prototype, "dataURL",
 
 Object.defineProperty(dictionary.Model.prototype, "hasData",
 {
- get: function() { return this.data !== null; }
+ get: function() { return this._data !== null; }
 });
 
 /**
@@ -258,7 +258,6 @@ dictionary.Model.prototype.extractData = function(response)
  }
  else
  {
-  this.data = null;
   this.message = dictionary.Error.EMPTY_RESPONSE;
 
   if(response.responseText)
@@ -268,9 +267,12 @@ dictionary.Model.prototype.extractData = function(response)
    try
    {
     parsed = JSON.parse(response.responseText);
-    this.data = parsed.contents ? new Blob([parsed.contents], {type: "text/plain"}) : null;
+    this.data = new Blob([parsed.contents], {type: "text/plain"});
    }
-   catch(e) {}
+   catch(e)
+   {
+    this.data = null;
+   }
 
    if(this.message.length > 512)
    {
