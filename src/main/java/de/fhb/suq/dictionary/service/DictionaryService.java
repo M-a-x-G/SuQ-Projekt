@@ -15,6 +15,7 @@ import de.fhb.suq.dictionary.dto.ImportDTO;
 import de.fhb.suq.dictionary.model.Definition;
 import de.fhb.suq.dictionary.model.Word;
 import de.fhb.suq.dictionary.model.WordIndex;
+import de.fhb.suq.dictionary.repository.DTOMapper;
 import de.fhb.suq.dictionary.repository.DefinitionRepository;
 import de.fhb.suq.dictionary.repository.WordIndexRepository;
 import de.fhb.suq.dictionary.repository.WordRepository;
@@ -37,14 +38,12 @@ public class DictionaryService {
 
     public List<DefinitionDTO> findAllWords() {
         List<Word> words = wordRepository.findAll();
-        List<DefinitionDTO> out = new ArrayList<>();
+        return DTOMapper.mapWordListToDefinitionDTOList(words);
+    }
 
-        for (Word word : words) {
-            List<String> definitions = word.getDefinitions().stream().map(Definition::getValue).collect(Collectors.toList());
-            out.add(new DefinitionDTO(word.getWord(), definitions));
-        }
-
-        return out;
+    public List<DefinitionDTO> findWordsByWord(String query){
+        List<Word> words = wordRepository.findBySearchString(query);
+        return DTOMapper.mapWordListToDefinitionDTOList(words);
     }
 
     public void createUpdateEntries(ImportDTO importDTO) {
@@ -89,4 +88,6 @@ public class DictionaryService {
 
         }
     }
+
+
 }

@@ -42,10 +42,10 @@ public interface WordRepository extends Repository<Word, Serializable> {
      */
     public List<Word> findAll(Pageable pageable);
 
+    public Word findByWord(String Word);
 
-    public Word findByWord(String word);
 
     @Query("SELECT w FROM Word w WHERE w.word LIKE :search ORDER BY w.id DESC")
-    public List<Word> findAllOrdered(@Param("search") String search, Pageable pageable);
+    public List<Word> findBySearchString(@Param("search") String search);
 
 }
