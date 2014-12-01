@@ -15,7 +15,7 @@ import de.fhb.suq.dictionary.model.WordIndex;
  */
 @RepositoryDefinition(domainClass = WordIndex.class, idClass = Integer.class)
 @Transactional(readOnly = true)
-public interface WordIndexRepository extends Repository<WordIndex, Serializable> {
+public interface IWordIndexRepository extends Repository<WordIndex, Serializable> {
     /**
      * Persists or updates the given {@link de.fhb.suq.dictionary.model.WordIndex} instance.
      *

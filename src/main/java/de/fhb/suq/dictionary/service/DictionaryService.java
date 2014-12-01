@@ -13,22 +13,22 @@ import de.fhb.suq.dictionary.dto.ImportDTO;
 import de.fhb.suq.dictionary.model.Definition;
 import de.fhb.suq.dictionary.model.Word;
 import de.fhb.suq.dictionary.model.WordIndex;
-import de.fhb.suq.dictionary.repository.DefinitionRepository;
-import de.fhb.suq.dictionary.repository.WordIndexRepository;
-import de.fhb.suq.dictionary.repository.WordRepository;
+import de.fhb.suq.dictionary.repository.IDefinitionRepository;
+import de.fhb.suq.dictionary.repository.IWordIndexRepository;
+import de.fhb.suq.dictionary.repository.IWordRepository;
 
 @Component
 @Service
 public class DictionaryService implements IDictionaryService {
 
     @Autowired
-    private WordRepository wordRepository;
+    private IWordRepository wordRepository;
 
     @Autowired
-    private DefinitionRepository definitionRepository;
+    private IDefinitionRepository definitionRepository;
 
     @Autowired
-    private WordIndexRepository wordIndexRepository;
+    private IWordIndexRepository wordIndexRepository;
 
 
     /**

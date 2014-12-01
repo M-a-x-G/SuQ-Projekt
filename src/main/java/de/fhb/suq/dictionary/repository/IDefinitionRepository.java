@@ -13,7 +13,7 @@ import de.fhb.suq.dictionary.model.Definition;
 
 @RepositoryDefinition(domainClass = Definition.class, idClass = Integer.class)
 @Transactional(readOnly = true)
-public interface DefinitionRepository extends Repository<Definition, Serializable> {
+public interface IDefinitionRepository extends Repository<Definition, Serializable> {
 
     /**
      * Persists or updates the given {@link de.fhb.suq.dictionary.model.Definition} instance.

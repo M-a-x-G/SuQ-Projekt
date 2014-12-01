@@ -16,7 +16,7 @@ import de.fhb.suq.dictionary.model.Word;
 
 @RepositoryDefinition(domainClass = Word.class, idClass = Integer.class)
 @Transactional(readOnly = true)
-public interface WordRepository extends Repository<Word, Serializable> {
+public interface IWordRepository extends Repository<Word, Serializable> {
 
     /**
      * Persists or updates the given {@link Word} instance.
