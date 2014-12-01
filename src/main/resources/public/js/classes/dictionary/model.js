@@ -265,22 +265,25 @@ dictionary.Model.prototype.extractData = function(response)
    try
    {
     result = JSON.parse(response.responseText);
-    this.message = "<table><tbody>\n<tr><td>Wort</td><td>Definition</td></tr>\n";
+    this.message = "<table><thead>\n<tr><th>Wort</th><th>Definition</th></tr></thead>\n<tbody>";
     data = "";
 
     for(i = 0, lenI = result.length; i < lenI; ++i)
     {
      word = result[i].word;
      definitions = result[i].definitions;
+     this.message += "<tr><td>" + word + "</td><td>";
 
      for(j = 0, lenJ = definitions.length; j < lenJ; ++j)
      {
       definition = definitions[j];
       data += word + ": ";
-      data += definition + " ";
-      this.message += "<tr><td>" + word + "</td>";
-      this.message += "<td>" + definition + "</td></tr>\n";
+      data += definition;
+      this.message += definition;
+      this.message = (i+1 < lenJ) ? this.message + "; " : this.message + " ";
      }
+
+     this.message += "</td></tr>\n";
     }
 
     this.message += "</tbody></table>\n";
