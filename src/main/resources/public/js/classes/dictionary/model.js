@@ -242,7 +242,7 @@ dictionary.Model.prototype.parseStopwords = function(result, callback)
 
 dictionary.Model.prototype.extractData = function(response)
 {
- var parsed;
+ var i, j, len, result, data, word, definitions, definition;
 
  if(response.status === 404)
  {
@@ -262,21 +262,33 @@ dictionary.Model.prototype.extractData = function(response)
 
   if(response.responseText)
   {
-   this.message = response.responseText;
-
    try
    {
-    parsed = JSON.parse(response.responseText);
-    this.data = new Blob([response.responseText], {type: "text/plain"});
+    result = JSON.parse(response.responseText);
+    this.message = "<table><tbody>\n<tr><td>Wort</td><td>Definition</td></tr>\n";
+    data = "";
+
+    for(i = 0, lenI = result.length; i < lenI; ++i)
+    {
+     word = result[i].word;
+     definitions = result[i].definitions;
+
+     for(j = 0, lenJ = definitions.length; j < lenJ; ++j)
+     {
+      data += word + ": ";
+      data += definitions[j] + " ";
+      this.message += "<tr><td>" + word + "</td>";
+      this.message += "<td>" + definitions[j] + "</td></tr>\n";
+     }
+    }
+
+    this.message = "</tbody></table>\n";
+    this.data = new Blob([data], {type: "text/plain"});
    }
    catch(e)
    {
+    this.message = response.responseText;
     this.data = null;
-   }
-
-   if(this.message.length > 512)
-   {
-    this.message = this.message.substring(0, 512) + "&hellip;";
    }
   }
  }
