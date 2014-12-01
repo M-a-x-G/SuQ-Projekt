@@ -76,8 +76,9 @@ public class DictionaryService implements IDictionaryService {
                     if (word.getDefinitions() == null) {
                         word.setDefinitions(new HashSet<>());
                     }
-                    word.getDefinitions().add(definition);
+
                     definition = definitionRepository.save(definition);
+                    word.getDefinitions().add(definition);
                 }
                 if (definition.getWordIndexes() == null) {
                     definition.setWordIndexes(new HashSet<>());

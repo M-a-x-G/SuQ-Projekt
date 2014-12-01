@@ -34,7 +34,7 @@ public class DictionaryController {
     @ResponseBody
     ResponseEntity<String> addEntries(@RequestBody ImportDTO dto) {
         dictionaryService.createUpdateEntries(dto);
-        return new ResponseEntity<>("Everything added", HttpStatus.OK);
+        return new ResponseEntity<>("Alle Elemente hinzugefügt", HttpStatus.OK);
     }
 
 
