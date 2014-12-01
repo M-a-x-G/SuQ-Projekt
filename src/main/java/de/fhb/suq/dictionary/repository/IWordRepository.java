@@ -10,8 +10,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.io.Serializable;
 import java.util.List;
 
-import de.fhb.suq.dictionary.model.Definition;
-import de.fhb.suq.dictionary.model.WordIndex;
 import de.fhb.suq.dictionary.model.Word;
 
 @RepositoryDefinition(domainClass = Word.class, idClass = Integer.class)
@@ -28,12 +26,13 @@ public interface IWordRepository extends Repository<Word, Serializable> {
 
     /**
      * Find all words
+     *
      * @return List of all words
      */
     public List<Word> findAll();
 
     /**
-     *  Find all words(pageable)
+     * Find all words(pageable)
      *
      * @return paged list
      */
@@ -41,6 +40,7 @@ public interface IWordRepository extends Repository<Word, Serializable> {
 
     /**
      * Find Word object with given word
+     *
      * @param Word for search
      * @return Word object
      */
@@ -49,6 +49,7 @@ public interface IWordRepository extends Repository<Word, Serializable> {
 
     /**
      * Search for words like search string
+     *
      * @param search text
      * @return List of Word objects
      */

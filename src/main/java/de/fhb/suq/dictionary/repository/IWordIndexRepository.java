@@ -26,6 +26,7 @@ public interface IWordIndexRepository extends Repository<WordIndex, Serializable
 
     /**
      * Search a WordIndex object with by keyword
+     *
      * @param keyword -> string for search
      * @return WordIndex String
      */

@@ -25,12 +25,14 @@ public interface IDefinitionRepository extends Repository<Definition, Serializab
 
     /**
      * Get all Definitions in DB
+     *
      * @return List of Definition objects
      */
     public List<Definition> findAll();
 
     /**
      * Find a Definition object by its value
+     *
      * @param value for search
      * @return Definition object
      */
