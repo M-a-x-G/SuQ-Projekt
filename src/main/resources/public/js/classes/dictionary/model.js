@@ -242,7 +242,7 @@ dictionary.Model.prototype.parseStopwords = function(result, callback)
 
 dictionary.Model.prototype.extractData = function(response)
 {
- var i, j, len, result, data, word, definitions, definition;
+ var i, j, lenI, lenJ, result, data, word, definitions, definition;
 
  if(response.status === 404)
  {
@@ -275,14 +275,15 @@ dictionary.Model.prototype.extractData = function(response)
 
      for(j = 0, lenJ = definitions.length; j < lenJ; ++j)
      {
+      definition = definitions[j];
       data += word + ": ";
-      data += definitions[j] + " ";
+      data += definition + " ";
       this.message += "<tr><td>" + word + "</td>";
-      this.message += "<td>" + definitions[j] + "</td></tr>\n";
+      this.message += "<td>" + definition + "</td></tr>\n";
      }
     }
 
-    this.message = "</tbody></table>\n";
+    this.message += "</tbody></table>\n";
     this.data = new Blob([data], {type: "text/plain"});
    }
    catch(e)
