@@ -280,7 +280,7 @@ dictionary.Model.prototype.extractData = function(response)
       data += word + ": ";
       data += definition;
       this.message += definition;
-      this.message = (i+1 < lenJ) ? this.message + "; " : this.message + " ";
+      this.message = (j + 1 < lenJ) ? this.message + "; " : this.message + " ";
      }
 
      this.message += "</td></tr>\n";
