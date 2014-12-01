@@ -28,17 +28,17 @@ var dictionary = dictionary || {};
  "use strict";
 
 /**
- * Collection of Error Strings.
+ * Enumeration of Errors.
  */
 
-dictionary.Error = {
- TIMEOUT: "<h1>Fehler</h1><p>Der Server hat nicht rechtzeitig antworten k&ouml;nnen. Versuchen Sie es sp&auml;ter erneut!</p>",
- FILEREADER: "<h1>Fehler</h1><p>Die FileReader API ist in Ihrem Browser nicht verf&uuml;gbar.</p>",
- EMPTY: "<h1>Fehler</h1><p>Die vom Server erhaltene Antwort war leer.</p>",
- BAD_RESPONSE_CODE: "<h1>Fehler</h1><p>Die Anfrage ist fehlgeschlagen.</p>",
- NO_RESPONSE: "<h1>Fehler</h1><p>Der Server antwortet nicht.</p>",
- NOT_FOUND: "<h1>Fehler 404</h1><p>Nicht gefunden.</p>"
-};
+dictionary.Error = Object.freeze({
+ TIMEOUT: "<h1>Fehler - Zeit&uuml;berschreitung</h1><p>Der Server hat nicht rechtzeitig antworten k&ouml;nnen. Versuchen Sie es sp&auml;ter erneut!</p>",
+ FILEREADER: "<h1>Fehler - API nicht verf&uuml;gbar</h1><p>Die FileReader API ist in Ihrem Browser nicht verf&uuml;gbar.</p>",
+ EMPTY: "<h1>Fehler - Leere Antwort</h1><p>Die vom Server erhaltene Antwort war leer.</p>",
+ BAD_RESPONSE_CODE: "<h1>Fehler - Schlechter Status Code</h1><p>Die Anfrage ist fehlgeschlagen.</p>",
+ NO_RESPONSE: "<h1>Fehler - Keine Verbindung</h1><p>Der Server antwortet nicht.</p>",
+ NOT_FOUND: "<h1>Fehler - 404</h1><p>Nicht gefunden.</p>"
+});
 
 /** End of Strict-Mode-Encapsulation **/
 }(dictionary));

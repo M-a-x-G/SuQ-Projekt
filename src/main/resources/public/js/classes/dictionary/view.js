@@ -31,16 +31,23 @@ var dictionary = dictionary || {};
  * Dictionary View Class.
  *
  * @param {HTMLElement} container The container to use for displaying the main contents.
- * @param {HTMLElement} container The container to use for displaying secondary info contents.
  */
 
-dictionary.View = function(contents, infos)
+dictionary.View = function(contents)
 {
- this.contents = (contents === undefined) ? document.body : contents;
- this.infos = (infos === undefined) ? document.body : infos;
+ this._contents = (contents === undefined) ? document.body : contents;
  this.progress = new Image();
  this.progress.src = "../img/loading.gif";
 };
+
+/**
+ * Getter for the contents container.
+ */
+
+Object.defineProperty(dictionary.View.prototype, "contents",
+{
+ get: function() { return this._contents; }
+});
 
 /**
  * Visualizes that the site is busy.

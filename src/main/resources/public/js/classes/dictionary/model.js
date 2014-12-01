@@ -37,7 +37,7 @@ dictionary.Model = function()
  this._data = null;
  this._loadedFiles = 0;
  this._totalFiles = 0;
- this.bundle = {
+ this._bundle = {
   definitions: [],
   stopwords: null
  };
@@ -76,7 +76,7 @@ Object.defineProperty(dictionary.Model.prototype, "dataURL",
 });
 
 /**
- * Getter for information about whether there is data available to download.
+ * Tells whether there is data available.
  */
 
 Object.defineProperty(dictionary.Model.prototype, "hasData",
@@ -105,6 +105,15 @@ Object.defineProperty(dictionary.Model.prototype, "totalFiles",
 });
 
 /**
+ * Getter for bundle.
+ */
+
+Object.defineProperty(dictionary.Model.prototype, "bundle",
+{
+ get: function() { return this._bundle; }
+});
+
+/**
  * Tries to send the object which contains
  * the parsed data from the input files.
  * Only sends the object when all files have been processed.
@@ -117,6 +126,21 @@ Object.defineProperty(dictionary.Model.prototype, "totalFiles",
 dictionary.Model.prototype.tryToSend = function(callback)
 {
  if(this.loadedFiles >= this.totalFiles) { callback(this.bundle); }
+};
+
+/**
+ * Resets the definitions and stopwords, loaded files and total files.
+ *
+ * @this {Model}
+ */
+
+dictionary.Model.prototype.reset = function()
+{
+ // Reset the bundle of definitions and stopwords.
+ this.bundle.definitions.length = 0;
+ this.bundle.stopwords = null;
+ this.loadedFiles = 0;
+ this.totalFiles = 0;
 };
 
 /**
@@ -165,10 +189,6 @@ dictionary.Model.prototype.parseDefinitions = function(result, callback)
    }
   }
  }
-
- // Reset the bundle of definitions and stopwords.
- this.bundle.definitions.length = 0;
- this.bundle.stopwords = null;
 
  for(i = 0, len = wordDefs.words.length; i < len; ++i)
  {

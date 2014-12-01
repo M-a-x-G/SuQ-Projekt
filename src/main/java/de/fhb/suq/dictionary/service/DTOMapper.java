@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import de.fhb.suq.dictionary.dto.DefinitionDTO;
-import de.fhb.suq.dictionary.model.Definition;
 import de.fhb.suq.dictionary.model.Word;
 
 public class DTOMapper {

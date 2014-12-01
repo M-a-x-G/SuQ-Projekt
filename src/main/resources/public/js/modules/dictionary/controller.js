@@ -36,7 +36,7 @@ dictionary.Controller = (function()
  var model, view, localEventCache = [],
   definitionsReader, stopwordsReader,
   requestsLocked = false, backForward = true,
-  nextURL = null, postfix = "/min", charset = "ISO-8859-1";
+  nextURL = null, shortcut = "/min/", charset = "ISO-8859-1";
 
  /**
   * Sends a given object to the URL which is currently set.
@@ -47,8 +47,9 @@ dictionary.Controller = (function()
 
  function sendObject(obj)
  {
-  window.ajax.open("POST", nextURL + postfix, true);
+  window.ajax.open("POST", nextURL, true);
   window.ajax.setRequestHeader("Content-Type", "application/json; charset=" + charset);
+  window.ajax.timeout = 0;
   window.ajax.send(JSON.stringify(obj));
  }
 
@@ -118,8 +119,7 @@ dictionary.Controller = (function()
   // Check if the File API is available.
   if(window.File && window.FileReader && window.FileList && window.Blob)
   {
-   model.loadedFiles = 0;
-   model.totalFiles = 0;
+   model.reset();
 
    // Check if there is a file to work with.
    if(form.definitions && form.definitions.files.length > 0)
@@ -179,7 +179,7 @@ dictionary.Controller = (function()
 
  function navigate(firingElement)
  {
-  var formData;
+  var formData, index;
 
   if(firingElement.action)
   {
@@ -193,8 +193,8 @@ dictionary.Controller = (function()
    else
    {
     requestsLocked = true;
-    window.ajax.open("GET", nextURL + postfix + "?" + serialize(firingElement), true);
-    window.ajax.timeout = 10000;
+    window.ajax.open("GET", nextURL + "?" + serialize(firingElement), true);
+    window.ajax.timeout = 0;
     window.ajax.send(null);
    }
   }
@@ -202,8 +202,9 @@ dictionary.Controller = (function()
   {
    nextURL = firingElement.href;
    requestsLocked = true;
-   window.ajax.open("GET", nextURL + postfix, true);
-   window.ajax.timeout = 4000;
+   index = nextURL.lastIndexOf("/");
+   window.ajax.open("GET", nextURL.substring(0, index) + shortcut + nextURL.substring(index + 1, nextURL.length), true);
+   window.ajax.timeout = 0;
    window.ajax.send(null);
   }
  }
@@ -334,7 +335,7 @@ dictionary.Controller = (function()
  function init()
  {
   model = new dictionary.Model();
-  view = new dictionary.View(document.getElementById("contents"), document.getElementById("footer"));
+  view = new dictionary.View(document.getElementById("contents"));
 
   window.addEvent(window.ajax, "readystatechange", handleResponse);
   window.addEvent(window.ajax, "timeout", handleTimeout);
