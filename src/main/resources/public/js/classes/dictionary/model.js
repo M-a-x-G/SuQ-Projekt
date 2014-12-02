@@ -17,7 +17,7 @@
  *  3. This notice may not be removed or altered from any source distribution.
 
  * @author Raoul van Rueschen
- * @version 0.0.2, 27.11.2014
+ * @version 0.1.0, 1.12.2014
  */
 
 var dictionary = dictionary || {};
@@ -161,7 +161,7 @@ dictionary.Model.prototype.parseDefinitions = function(result, callback)
    definitions: []
   };
 
- arr = result.split(':');
+ arr = result.split(":");
 
  // The first element is always a single word.
  wordDefs.words.push(arr[0]);
@@ -170,23 +170,32 @@ dictionary.Model.prototype.parseDefinitions = function(result, callback)
  // Subsequent elements are definitions, which still contain a keyword at the end.
  for(i = 1, j = 0, len = arr.length; i < len; ++i)
  {
-  lastSpace = arr[i].lastIndexOf(' ');
-
-  if(lastSpace > 0)
+  // Not the last element.
+  if(i + 1 < len)
   {
-   // Extract the definition, remove line breaks and unnecessary spaces and save it by using j.
-   wordDefs.definitions[j].push(arr[i].substring(0, lastSpace).replace(regexp, ''));
-   // Extract the word.
-   word = arr[i].substring(++lastSpace, arr[i].length);
-   // Check if the word is already in the array and if so: use its index.
-   j = wordDefs.words.indexOf(word);
+   lastSpace = arr[i].lastIndexOf(" ");
 
-   // Otherwise, push it and make some room for more definitions.
-   if(j < 0)
+   if(lastSpace > 0)
    {
-    j = wordDefs.words.push(word) - 1;
-    wordDefs.definitions.push([]);
+    // Extract the definition, remove line breaks and unnecessary spaces and save it by using j.
+    wordDefs.definitions[j].push(arr[i].substring(0, lastSpace).replace(regexp, ""));
+    // Extract the word.
+    word = arr[i].substring(++lastSpace, arr[i].length);
+    // Check if the word is already in the array and if so: use its index.
+    j = wordDefs.words.indexOf(word);
+
+    // Otherwise, push it and make some room for more definitions.
+    if(j < 0)
+    {
+     j = wordDefs.words.push(word) - 1;
+     wordDefs.definitions.push([]);
+    }
    }
+  }
+  else
+  {
+   // This is the last element in arr so there's no keyword to extract.
+   wordDefs.definitions[j].push(arr[i].replace(regexp, ""));
   }
  }
 
@@ -214,15 +223,26 @@ dictionary.Model.prototype.parseDefinitions = function(result, callback)
 dictionary.Model.prototype.parseStopwords = function(result, callback)
 {
  var i, len, regexp,
-  stopwords = result.split(" ");
+  stopwords = result.split(" "),
+  noDuplicates = [];
 
+ // Remove duplicates.
+ for(i = 0, len = stopwords.length; i < len; ++i)
+ {
+  if(noDuplicates.indexOf(stopwords[i]) === -1)
+  {
+   noDuplicates.push(stopwords[i]);
+  }
+ }
+
+ // Build regular expression as string.
  i = 0;
- len = stopwords.length;
- regexp = len ? "/" : "";
+ len = noDuplicates.length;
+ regexp = len ? "/" : null;
 
  while(i < len)
  {
-  regexp += "\b" + stopwords[i++] + "\b";
+  regexp += "\b" + noDuplicates[i++] + "\b";
   regexp = (i < len) ? regexp + "|" : regexp + "/g";
  }
 
@@ -230,6 +250,44 @@ dictionary.Model.prototype.parseStopwords = function(result, callback)
 
  ++this.loadedFiles;
  this.tryToSend(callback);
+};
+
+/**
+ * Creates an html-table with the values from the result object and 
+ * prepares a downloadable text blob.
+ *
+ * @this {Model}
+ * @param {Array<Object>} result An array that was reconstructed from a JSON-String which was received from the server. Contains word:definition pairs.
+ * @return {?Blob}
+ */
+
+dictionary.Model.prototype.prepareForDownload = function(result)
+{
+ var i, j, lenI, lenJ, word, definitions, definition,
+  data = "";
+
+ this.message = "<table><thead>\n<tr><th>Wort</th><th>Definitionen</th></tr></thead>\n<tbody>";
+
+ for(i = 0, lenI = result.length; i < lenI; ++i)
+ {
+  word = result[i].word;
+  definitions = result[i].definitions;
+  this.message += "<tr><td>" + word + "</td><td>";
+
+  for(j = 0, lenJ = definitions.length; j < lenJ; ++j)
+  {
+   definition = definitions[j];
+   data += word + ": ";
+   data += definition + " ";
+   this.message += "<span>" + definition + "</span>";
+  }
+
+  this.message += "</td></tr>\n";
+ }
+
+ this.message += "</tbody></table>\n";
+
+ return (data !== "") ? new Blob([data], {type: "text/plain"}) : null;
 };
 
 /**
@@ -242,7 +300,7 @@ dictionary.Model.prototype.parseStopwords = function(result, callback)
 
 dictionary.Model.prototype.extractData = function(response)
 {
- var i, j, lenI, lenJ, result, data, word, definitions, definition;
+ var result;
 
  if(response.status === 404)
  {
@@ -265,29 +323,7 @@ dictionary.Model.prototype.extractData = function(response)
    try
    {
     result = JSON.parse(response.responseText);
-    this.message = "<table><thead>\n<tr><th>Wort</th><th>Definition</th></tr></thead>\n<tbody>";
-    data = "";
-
-    for(i = 0, lenI = result.length; i < lenI; ++i)
-    {
-     word = result[i].word;
-     definitions = result[i].definitions;
-     this.message += "<tr><td>" + word + "</td><td>";
-
-     for(j = 0, lenJ = definitions.length; j < lenJ; ++j)
-     {
-      definition = definitions[j];
-      data += word + ": ";
-      data += definition;
-      this.message += definition;
-      this.message = (j + 1 < lenJ) ? this.message + "; " : this.message + " ";
-     }
-
-     this.message += "</td></tr>\n";
-    }
-
-    this.message += "</tbody></table>\n";
-    this.data = new Blob([data], {type: "text/plain"});
+    this.data = this.prepareForDownload(result);
    }
    catch(e)
    {

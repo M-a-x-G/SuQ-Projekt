@@ -110,13 +110,27 @@ table {
 tr {
 }
 
-td {
+th, td {
  font-size: 3.8vmin;
  background-color: rgb(240, 240, 240);
- text-align: center;
+ text-align: left;
  vertical-align: middle;
  border-radius: 8px;
- padding: 6px; 
+ padding: 6px;
+ color: rgb(50, 50, 50);
+}
+
+th {
+ font-weight: bold;
+ color: black;
+}
+
+td span {
+ display: inline-block;
+ padding: 0 1vw;
+ margin-right: 1vw;
+ border: 1px solid rgb(185, 185, 185);
+ border-radius: 8px;
 }
 
 /**
@@ -135,9 +149,12 @@ a:visited {
 }
 
 a:hover,
-a:focus,
 a:active {
  color: red;
+}
+
+#dl:hover {
+ border-color: red;
 }
 
 #navigation {
@@ -168,6 +185,15 @@ a:active {
 
 #navigation a.current {
  color: rgb(255, 100, 100);
+}
+
+#dl {
+ display: inline-block;
+ border: 1px solid blue;
+ border-radius: 8px;
+ padding: 0 1vw;
+ margin-top: 5vh;
+ transition: border-color 0.5s, color 0.5s;
 }
 
 /**
@@ -258,7 +284,7 @@ div[role="contentinfo"] {
  right: 0;
  // width: 80vw;
  padding: 10vh 10vw 0vh 10vw;
- overflow: hidden;
+ overflow: auto;
  text-align: center;
  //border-bottom: 4px dashed rgb(235, 235, 235);
 }
@@ -330,11 +356,7 @@ input[type="checkbox"]:checked {
  box-shadow: 0px 0px 12px rgb(225, 200, 160);
 }
 
-#upload {
- margin-top: 16vh;
-}
-
-#search {
+#upload, #export, #search {
  margin-top: 14vh;
 }
 

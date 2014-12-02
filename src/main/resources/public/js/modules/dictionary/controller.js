@@ -17,7 +17,7 @@
  *  3. This notice may not be removed or altered from any source distribution.
 
  * @author Raoul van Rueschen
- * @version 0.0.2, 27.11.2014
+ * @version 0.1.0, 01.12.2014
  */
 
 var dictionary = dictionary || {};
@@ -36,7 +36,7 @@ dictionary.Controller = (function()
  var model, view, localEventCache = [],
   definitionsReader, stopwordsReader,
   requestsLocked = false, backForward = true,
-  nextURL = null, shortcut = "/min/", charset = "ISO-8859-1";
+  nextURL = null, shortcut = "/min/", charset = "UTF-8"/*"iso-8859-1"*/;
 
  /**
   * Sends a given object to the URL which is currently set.
@@ -47,6 +47,7 @@ dictionary.Controller = (function()
 
  function sendObject(obj)
  {
+  //console.log(obj);
   window.ajax.open("POST", nextURL, true);
   window.ajax.setRequestHeader("Content-Type", "application/json; charset=" + charset);
   window.ajax.timeout = 0;
@@ -119,11 +120,11 @@ dictionary.Controller = (function()
   // Check if the File API is available.
   if(window.File && window.FileReader && window.FileList && window.Blob)
   {
-   model.reset();
-
    // Check if there is a file to work with.
    if(form.definitions && form.definitions.files.length > 0)
    {
+    model.reset();
+
     f1 = form.definitions.files[0];
     v1 = validateFile(f1);
 
@@ -193,6 +194,7 @@ dictionary.Controller = (function()
    else
    {
     requestsLocked = true;
+    view.showProgress();
     window.ajax.open("GET", nextURL + "?" + serialize(firingElement), true);
     window.ajax.timeout = 0;
     window.ajax.send(null);
@@ -224,7 +226,7 @@ dictionary.Controller = (function()
    model.extractData(this);
    view.display(model.message);
    bindListeners();
-   nextURL = (nextURL.indexOf("entries") < 0) ? nextURL : nextURL.replace("entries", "export.html");
+   nextURL = (nextURL.indexOf(".html") < 0) ? nextURL.substring(0, nextURL.lastIndexOf("/")) + "/index.html" : nextURL;
    History.pushState(null, null, nextURL); // this.responseURL would contain the full URL used for this request.
 
    if(model.hasData)

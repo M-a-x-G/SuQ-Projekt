@@ -17,7 +17,7 @@
  *  3. This notice may not be removed or altered from any source distribution.
 
  * @author Raoul van Rueschen
- * @version 0.0.2, 27.11.2014
+ * @version 0.1.0, 01.12.2014
  */
 
 var dictionary = dictionary || {};
@@ -89,9 +89,11 @@ dictionary.View.prototype.addDownloadLink = function(name, url)
  var div = document.createElement("div"),
   link = document.createElement("a");
 
+ div.id = "dlWrap";
+ link.id = "dl";
  link.href = url;
  link.download = name;
- link.innerHTML = "Download";
+ link.innerHTML = "Herunterladen";
  div.appendChild(link);
  this.contents.appendChild(div);
 };
