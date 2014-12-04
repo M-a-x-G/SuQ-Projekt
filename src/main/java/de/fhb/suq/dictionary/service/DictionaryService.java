@@ -33,6 +33,7 @@ public class DictionaryService implements IDictionaryService {
 
     /**
      * Get all words and definitions from DB
+     *
      * @return List of DefinitionDTOs
      */
     @Override
@@ -43,6 +44,7 @@ public class DictionaryService implements IDictionaryService {
 
     /**
      * Get a list of words and definitions
+     *
      * @param query -> text for search
      * @return List of DefinitionDTOs
      */
@@ -54,6 +56,7 @@ public class DictionaryService implements IDictionaryService {
 
     /**
      * Create or update DB with given entries
+     *
      * @param importDTO entries to add
      */
     @Override
@@ -70,6 +73,7 @@ public class DictionaryService implements IDictionaryService {
             List<String> definitionStringList = definitionDTO.getDefinitions();
             for (String definitionString : definitionStringList) {
                 definition = definitionRepository.findByValue(definitionString);
+                String stopWords = importDTO.getStopwords();
                 if (definition == null) {
                     definition = new Definition();
                     definition.setValue(definitionString);
@@ -85,7 +89,9 @@ public class DictionaryService implements IDictionaryService {
                 }
 
                 definitionString = definitionString.replaceAll("[,.]", "");
-                definitionString = definitionString.replaceAll(importDTO.getStopwords(), "");
+                if (stopWords != null && !stopWords.isEmpty()) {
+                    definitionString = definitionString.replaceAll(stopWords, "");
+                }
                 for (String keyword : definitionString.split("[ ]")) {
                     WordIndex wordIndex = wordIndexRepository.findByKeyword(keyword);
                     if (wordIndex == null) {
