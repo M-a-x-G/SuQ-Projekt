@@ -1,6 +1,5 @@
 package de.fhb.suq.dictionary.repository;
 
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.Repository;
 import org.springframework.data.repository.RepositoryDefinition;
@@ -30,13 +29,6 @@ public interface IWordRepository extends Repository<Word, Serializable> {
      * @return List of all words
      */
     public List<Word> findAll();
-
-    /**
-     * Find all words(pageable)
-     *
-     * @return paged list
-     */
-    public List<Word> findAll(Pageable pageable);
 
     /**
      * Find Word object with given word
