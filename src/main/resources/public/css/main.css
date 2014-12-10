@@ -221,6 +221,7 @@ div[role="banner"] {
  font-family: Walkway, Sans-Serif;
  font-size: 4vmin;
  text-align: center;
+ padding: 0;
  color: rgb(210, 210, 210);
 }
 
@@ -228,6 +229,7 @@ div[role="banner"] {
  font-family: Walkway, Sans-Serif;
  font-size: 3vmin;
  text-align: center;
+ padding: 0;
  color: rgb(210, 210, 210);
 }
 
