@@ -155,7 +155,9 @@ dictionary.Model.prototype.reset = function()
 dictionary.Model.prototype.parseDefinitions = function(result, callback)
 {
  var regexp = /\r?\n|\r|^\s+|\s+$/g,
-  i, j, len, arr, lastSpace, word,
+  i, j, len, arr, lastSpace,
+  word, definition,
+  defLookupMap = {},
   wordDefs = {
    words: [],
    definitions: []
@@ -178,7 +180,14 @@ dictionary.Model.prototype.parseDefinitions = function(result, callback)
    if(lastSpace > 0)
    {
     // Extract the definition, remove line breaks and unnecessary spaces and save it by using j.
-    wordDefs.definitions[j].push(arr[i].substring(0, lastSpace).replace(regexp, ""));
+    definition = arr[i].substring(0, lastSpace).replace(regexp, "");
+    // But only if it hasn't already been added!
+    if(!defLookupMap[definition])
+    {
+     wordDefs.definitions[j].push(definition);
+     defLookupMap[definition] = true;
+    }
+
     // Extract the word.
     word = arr[i].substring(++lastSpace, arr[i].length);
     // Check if the word is already in the array and if so: use its index.
@@ -309,6 +318,10 @@ dictionary.Model.prototype.extractData = function(response)
  else if(response.status === 0)
  {
   this.message = dictionary.Error.NO_RESPONSE;
+ }
+ else if(response.status === 204)
+ {
+  this.message = dictionary.Error.NO_CONTENT;
  }
  else if(response.status < 200 || response.status > 299)
  {

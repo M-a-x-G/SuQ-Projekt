@@ -37,6 +37,7 @@ dictionary.Error = Object.freeze({
  EMPTY: "<h1>Fehler - Leere Antwort</h1><p>Die vom Server erhaltene Antwort war leer.</p>",
  BAD_RESPONSE_CODE: "<h1>Fehler - Schlechter Status Code</h1><p>Die Anfrage ist fehlgeschlagen.</p>",
  NO_RESPONSE: "<h1>Fehler - Keine Verbindung</h1><p>Der Server antwortet nicht.</p>",
+ NO_CONTENT: "<h1>Kein Inhalt</h1><p>Die Anfrage lieferte keine Ergebnisse.</p>",
  NOT_FOUND: "<h1>Fehler - 404</h1><p>Nicht gefunden.</p>"
 });
 

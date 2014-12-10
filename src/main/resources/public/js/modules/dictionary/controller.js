@@ -50,7 +50,7 @@ dictionary.Controller = (function()
   //console.log(obj);
   window.ajax.open("POST", nextURL, true);
   window.ajax.setRequestHeader("Content-Type", "application/json; charset=" + charset);
-  window.ajax.timeout = 0;
+  window.ajax.timeout = 10000;
   window.ajax.send(JSON.stringify(obj));
  }
 
@@ -180,7 +180,7 @@ dictionary.Controller = (function()
 
  function navigate(firingElement)
  {
-  var formData, index;
+  var index;
 
   if(firingElement.action)
   {
@@ -226,8 +226,12 @@ dictionary.Controller = (function()
    model.extractData(this);
    view.display(model.message);
    bindListeners();
-   nextURL = (nextURL.indexOf(".html") < 0) ? nextURL.substring(0, nextURL.lastIndexOf("/")) + "/index.html" : nextURL;
-   History.pushState(null, null, nextURL); // this.responseURL would contain the full URL used for this request.
+
+   // Only support browser history changes for static resources.
+   if(nextURL.indexOf(".html") > -1)
+   {
+    History.pushState(null, null, nextURL);
+   }
 
    if(model.hasData)
    {

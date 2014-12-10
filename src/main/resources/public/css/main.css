@@ -62,7 +62,7 @@ h1, h2, h3, h4, h5, h6 {
  font-size: 6vmin;
  text-align: left;
  margin: auto;
- padding: 0;
+ padding: 1vmin 0;
 }
 
 h2 {
@@ -119,21 +119,21 @@ th, td {
  font-size: 3.8vmin;
  background-color: rgb(240, 240, 240);
  text-align: left;
- vertical-align: middle;
+ vertical-align: top;
  border-radius: 8px;
  padding: 6px;
  color: rgb(50, 50, 50);
 }
 
 th {
- font-weight: bold;
  color: black;
+ background-color: rgb(210, 210, 255);
 }
 
 td span {
  display: inline-block;
  padding: 0 1vw;
- margin-right: 1vw;
+ margin: 2px 0.5vw;
  border: 1px solid rgb(185, 185, 185);
  border-radius: 8px;
 }
