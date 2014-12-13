@@ -1,34 +1,24 @@
 /**
  * Copyright (c) 2014 Raoul van Rueschen
- * 
- * This software is provided 'as-is', without any express or implied
- * warranty. In no event will the authors be held liable for any damages
- * arising from the use of this software.
- * 
- * Permission is granted to anyone to use this software for any purpose,
- * including commercial applications, and to alter it and redistribute it
- * freely, subject to the following restrictions:
- *  1. The origin of this software must not be misrepresented; you must not
- *     claim that you wrote the original software. If you use this software
- *     in a product, an acknowledgment in the product documentation would be
- *     appreciated but is not required.
- *  2. Altered source versions must be plainly marked as such, and must not be
- *     misrepresented as being the original software.
- *  3. This notice may not be removed or altered from any source distribution.
-
+ * Licensed under the Zlib license.
+ *
+ * Dictionary Model Prototype.
+ * Holds the current state of the application and offers
+ * methods that can change or retrieve the data.
+ *
  * @author Raoul van Rueschen
- * @version 0.1.0, 1.12.2014
+ * @version 0.9.1, 13.12.2014
  */
 
 var dictionary = dictionary || {};
 
-// Defines the global objects that are used in this file.
-(function(undefined, window, dictionary)
+// Globals that are used in this file.
+(function(window, dictionary)
 {
  "use strict";
 
 /**
- * Dictionary Model Class.
+ * Dictionary Model.
  */
 
 dictionary.Model = function()
@@ -120,7 +110,7 @@ Object.defineProperty(dictionary.Model.prototype, "bundle",
  * This function is called after each parsing process.
  *
  * @this {Model}
- * @param {sendObject} callback The function to use for sending the object to the server.
+ * @param {sendObject} callback - The function to use for sending the object to the server.
  */
 
 dictionary.Model.prototype.tryToSend = function(callback)
@@ -148,7 +138,7 @@ dictionary.Model.prototype.reset = function()
  * Called asynchronously when the file has been read.
  *
  * @this {Model}
- * @param {string} result
+ * @param {string} result - The contents of a definitions-file.
  * @param {sendObject} callback
  */
 
@@ -225,7 +215,7 @@ dictionary.Model.prototype.parseDefinitions = function(result, callback)
  * Called asynchronously when the file has been read.
  *
  * @this {Model}
- * @param {string} result
+ * @param {string} result - The contents of a stopwords-file.
  * @param {sendObject} callback
  */
 
@@ -244,7 +234,7 @@ dictionary.Model.prototype.parseStopwords = function(result, callback)
   }
  }
 
- // Build regular expression as string.
+ // Build a regular expression string.
  i = 0;
  len = noDuplicates.length;
  regexp = len ? "/" : null;
@@ -266,7 +256,7 @@ dictionary.Model.prototype.parseStopwords = function(result, callback)
  * prepares a downloadable text blob.
  *
  * @this {Model}
- * @param {Array<Object>} result An array that was reconstructed from a JSON-String which was received from the server. Contains word:definition pairs.
+ * @param {Array<Object>} result - An array that was reconstructed from a JSON-string. Contains word:definition pairs.
  * @return {?Blob}
  */
 
@@ -304,7 +294,7 @@ dictionary.Model.prototype.prepareForDownload = function(result)
  * data for further use.
  *
  * @this {Model}
- * @param {XMLHttpRequest} response An ajax object containing the actual response information.
+ * @param {XMLHttpRequest} response - An ajax object containing the actual response information.
  */
 
 dictionary.Model.prototype.extractData = function(response)
@@ -348,7 +338,7 @@ dictionary.Model.prototype.extractData = function(response)
 };
 
 /** End of Strict-Mode-Encapsulation **/
-}(undefined, window, dictionary));
+}(window, dictionary));
 
 
 

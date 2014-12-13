@@ -1,34 +1,23 @@
 /**
  * Copyright (c) 2014 Raoul van Rueschen
- * 
- * This software is provided 'as-is', without any express or implied
- * warranty. In no event will the authors be held liable for any damages
- * arising from the use of this software.
- * 
- * Permission is granted to anyone to use this software for any purpose,
- * including commercial applications, and to alter it and redistribute it
- * freely, subject to the following restrictions:
- *  1. The origin of this software must not be misrepresented; you must not
- *     claim that you wrote the original software. If you use this software
- *     in a product, an acknowledgment in the product documentation would be
- *     appreciated but is not required.
- *  2. Altered source versions must be plainly marked as such, and must not be
- *     misrepresented as being the original software.
- *  3. This notice may not be removed or altered from any source distribution.
-
+ * Licensed under the Zlib license.
+ *
+ * Dictionary Controller Module.
+ * Handles events and manages the program's flow.
+ *
  * @author Raoul van Rueschen
- * @version 0.1.0, 01.12.2014
+ * @version 0.9.1, 13.12.2014
  */
 
 var dictionary = dictionary || {};
 
-// Defines the global objects that are used in this file.
+// Globals that are used in this file.
 (function(window, document, dictionary, History)
 {
  "use strict";
 
 /**
- * Dictionary Controller Module.
+ * Dictionary Controller.
  */
 
 dictionary.Controller = (function()
@@ -42,7 +31,7 @@ dictionary.Controller = (function()
   * Sends a given object to the URL which is currently set.
   *
   * @callback sendObject
-  * @param {Object} obj The object to stringify and send to the nextURL.
+  * @param {Object} obj - The object to stringify and send to the nextURL.
   */
 
  function sendObject(obj)
@@ -91,7 +80,7 @@ dictionary.Controller = (function()
    a = file.name.split("."),
    extension = (a.length === 1 || (a[0] === "" && a.length === 2)) ? "" : a.pop();
 
-  if(extension !== "in")
+  if(extension !== "in" && extension !== "out")
   {
    res.ok = false;
    res.msg = "Die angegebene Datei \"" + file.name + "\" weist nicht den richtigen Dateityp auf!";
@@ -110,7 +99,7 @@ dictionary.Controller = (function()
   * Currently, this function tries to read only two
   * specific file input fields: #definitions and #stopwords.
   *
-  * @param {HTMLFormElement} form A form in the DOM.
+  * @param {HTMLFormElement} form - A form in the DOM.
   */
 
  function readFiles(form)
@@ -175,7 +164,7 @@ dictionary.Controller = (function()
   * Locks the request system until the response has
   * been received and processed.
   * 
-  * @param {HTMLElement} firingElement An element whose click or submit event was triggered.
+  * @param {HTMLElement} firingElement - An element whose click or submit event was triggered.
   */
 
  function navigate(firingElement)
@@ -219,8 +208,6 @@ dictionary.Controller = (function()
 
  function handleResponse()
  {
-  var resText;
-
   if(this.readyState === 4)
   {
    model.extractData(this);
